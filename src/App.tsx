@@ -9,19 +9,24 @@ import {
 } from './types';
 import { INITIAL_RECIPES, INITIAL_PANTRY_ITEMS } from './data/mockRecipes';
 import { Header } from './components/Header';
+import { HomeLandingView } from './components/HomeLandingView';
 import { ExploreView } from './components/ExploreView';
 import { AiGeneratorView } from './components/AiGeneratorView';
 import { PantryView } from './components/PantryView';
 import { MealPlannerView } from './components/MealPlannerView';
 import { GroceryListView } from './components/GroceryListView';
 import { SavedCollectionsView } from './components/SavedCollectionsView';
+import { MyRecipesView } from './components/MyRecipesView';
+import { FollowingView } from './components/FollowingView';
+import { CreateRecipeModal } from './components/CreateRecipeModal';
 import { RecipeDetailModal } from './components/RecipeDetailModal';
 import { CookingModeModal } from './components/CookingModeModal';
 
 export default function App() {
-  // Navigation State
-  const [activeTab, setActiveTab] = useState<ActiveTab>('explore');
+  // Navigation State - default to the new Landing Page ('home')
+  const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
 
   // Core Data States
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
@@ -136,6 +141,11 @@ export default function App() {
     setRecipes(prev => [newRecipe, ...prev]);
   };
 
+  const handleSaveCustomRecipe = (customRecipe: Recipe) => {
+    setRecipes(prev => [customRecipe, ...prev]);
+    setActiveTab('my-recipes');
+  };
+
   // Grocery actions
   const handleAddIngredientsToGrocery = (ingredients: Ingredient[], recipeTitle?: string) => {
     const newItems: GroceryItem[] = ingredients.map((ing, idx) => {
@@ -241,7 +251,7 @@ export default function App() {
   const groceryCount = groceryItems.filter(i => !i.completed).length;
 
   return (
-    <div className="min-h-screen bg-stone-100/60 text-stone-900 font-sans flex flex-col selection:bg-amber-500 selection:text-stone-950">
+    <div className="min-h-screen bg-[#faf6f3] text-[#201a17] font-sans flex flex-col selection:bg-[#ffdbcd] selection:text-[#9f3d00]">
       
       {/* Top Header */}
       <Header
@@ -251,75 +261,134 @@ export default function App() {
         groceryCount={groceryCount}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        onOpenCreateRecipe={() => setIsCreateModalOpen(true)}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
-        {activeTab === 'explore' && (
-          <ExploreView
+      <main className="flex-1 w-full pt-20">
+        
+        {activeTab === 'home' && (
+          <HomeLandingView
             recipes={recipes}
             onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
             onToggleSave={handleToggleSave}
             onStartCooking={handleStartCooking}
-            onNavigateToGenerator={() => setActiveTab('generator')}
-            searchQuery={searchQuery}
+            onNavigate={(tab) => {
+              if (tab === 'create-recipe') {
+                setIsCreateModalOpen(true);
+              } else {
+                setActiveTab(tab);
+              }
+            }}
           />
         )}
 
-        {activeTab === 'generator' && (
-          <AiGeneratorView
-            pantryItems={pantryItems}
-            onRecipeGenerated={handleRecipeGenerated}
-            onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
-            onStartCooking={handleStartCooking}
-            onToggleSave={handleToggleSave}
-          />
+        {activeTab === 'explore' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <ExploreView
+              recipes={recipes}
+              onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
+              onToggleSave={handleToggleSave}
+              onStartCooking={handleStartCooking}
+              onNavigateToGenerator={() => setActiveTab('generator')}
+              searchQuery={searchQuery}
+            />
+          </div>
+        )}
+
+        {(activeTab === 'generator' || activeTab === 'ai-kitchen') && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <AiGeneratorView
+              pantryItems={pantryItems}
+              onRecipeGenerated={handleRecipeGenerated}
+              onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
+              onStartCooking={handleStartCooking}
+              onToggleSave={handleToggleSave}
+            />
+          </div>
         )}
 
         {activeTab === 'pantry' && (
-          <PantryView
-            pantryItems={pantryItems}
-            recipes={recipes}
-            onTogglePantryItem={handleTogglePantryItem}
-            onAddPantryItem={handleAddPantryItem}
-            onDeletePantryItem={handleDeletePantryItem}
-            onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
-            onStartCooking={handleStartCooking}
-            onAddMissingToGrocery={handleAddIngredientsToGrocery}
-          />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <PantryView
+              pantryItems={pantryItems}
+              recipes={recipes}
+              onTogglePantryItem={handleTogglePantryItem}
+              onAddPantryItem={handleAddPantryItem}
+              onDeletePantryItem={handleDeletePantryItem}
+              onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
+              onStartCooking={handleStartCooking}
+              onAddMissingToGrocery={handleAddIngredientsToGrocery}
+            />
+          </div>
         )}
 
         {activeTab === 'planner' && (
-          <MealPlannerView
-            recipes={recipes}
-            mealPlan={mealPlan}
-            onUpdateMeal={handleUpdateMeal}
-            onAutoPlanWeek={handleAutoPlanWeek}
-            onGenerateGroceriesFromPlan={(ings) => handleAddIngredientsToGrocery(ings, 'Weekly Meal Plan')}
-            onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
-          />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <MealPlannerView
+              recipes={recipes}
+              mealPlan={mealPlan}
+              onUpdateMeal={handleUpdateMeal}
+              onAutoPlanWeek={handleAutoPlanWeek}
+              onGenerateGroceriesFromPlan={(ings) => handleAddIngredientsToGrocery(ings, 'Weekly Meal Plan')}
+              onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
+            />
+          </div>
         )}
 
         {activeTab === 'groceries' && (
-          <GroceryListView
-            groceryItems={groceryItems}
-            onToggleGroceryItem={handleToggleGroceryItem}
-            onAddGroceryItem={handleAddGroceryItem}
-            onDeleteGroceryItem={handleDeleteGroceryItem}
-            onClearCompleted={handleClearCompletedGrocery}
-          />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <GroceryListView
+              groceryItems={groceryItems}
+              onToggleGroceryItem={handleToggleGroceryItem}
+              onAddGroceryItem={handleAddGroceryItem}
+              onDeleteGroceryItem={handleDeleteGroceryItem}
+              onClearCompleted={handleClearCompletedGrocery}
+            />
+          </div>
         )}
 
         {activeTab === 'saved' && (
-          <SavedCollectionsView
-            recipes={recipes}
-            onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
-            onToggleSave={handleToggleSave}
-            onStartCooking={handleStartCooking}
-            onNavigateToExplore={() => setActiveTab('explore')}
-          />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <SavedCollectionsView
+              recipes={recipes}
+              onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
+              onToggleSave={handleToggleSave}
+              onStartCooking={handleStartCooking}
+              onNavigateToExplore={() => setActiveTab('explore')}
+            />
+          </div>
         )}
+
+        {activeTab === 'my-recipes' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <MyRecipesView
+              recipes={recipes}
+              onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
+              onStartCooking={handleStartCooking}
+              onOpenCreateRecipe={() => setIsCreateModalOpen(true)}
+            />
+          </div>
+        )}
+
+        {activeTab === 'following' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <FollowingView
+              onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
+              onStartCooking={handleStartCooking}
+            />
+          </div>
+        )}
+
       </main>
+
+      {/* Create Recipe Modal */}
+      {isCreateModalOpen && (
+        <CreateRecipeModal
+          onClose={() => setIsCreateModalOpen(false)}
+          onSaveRecipe={handleSaveCustomRecipe}
+        />
+      )}
 
       {/* Recipe Detail Modal */}
       {selectedRecipeForDetail && (
@@ -341,72 +410,57 @@ export default function App() {
       )}
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 px-3 py-2 flex items-center justify-around">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#e1bfb2]/40 px-3 py-2 flex items-center justify-around">
         <button
-          onClick={() => setActiveTab('explore')}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold ${
-            activeTab === 'explore' ? 'text-amber-600' : 'text-stone-500'
+          onClick={() => setActiveTab('home')}
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
+            activeTab === 'home' ? 'text-[#9f3d00]' : 'text-[#594137]'
           }`}
         >
-          <span>🍽️</span>
+          <span className="material-symbols-outlined text-[20px]">home</span>
+          <span>Home</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('explore')}
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
+            activeTab === 'explore' ? 'text-[#9f3d00]' : 'text-[#594137]'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[20px]">explore</span>
           <span>Explore</span>
         </button>
 
         <button
           onClick={() => setActiveTab('generator')}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold ${
-            activeTab === 'generator' ? 'text-amber-600' : 'text-stone-500'
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
+            activeTab === 'generator' ? 'text-[#9f3d00]' : 'text-[#594137]'
           }`}
         >
-          <span>✨</span>
+          <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
           <span>AI Kitchen</span>
         </button>
 
         <button
-          onClick={() => setActiveTab('pantry')}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold ${
-            activeTab === 'pantry' ? 'text-emerald-600' : 'text-stone-500'
-          }`}
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-[#9f3d00] cursor-pointer"
         >
-          <span>🧊</span>
-          <span>Pantry</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('planner')}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold ${
-            activeTab === 'planner' ? 'text-blue-600' : 'text-stone-500'
-          }`}
-        >
-          <span>📅</span>
-          <span>Planner</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('groceries')}
-          className={`relative flex flex-col items-center gap-0.5 text-[10px] font-semibold ${
-            activeTab === 'groceries' ? 'text-purple-600' : 'text-stone-500'
-          }`}
-        >
-          <span>🛍️</span>
-          <span>Grocery</span>
-          {groceryCount > 0 && (
-            <span className="absolute -top-1 right-2 w-4 h-4 bg-purple-600 text-white rounded-full text-[9px] font-bold flex items-center justify-center">
-              {groceryCount}
-            </span>
-          )}
+          <div className="w-6 h-6 rounded-full bg-[#9f3d00] text-white flex items-center justify-center">
+            <span className="material-symbols-outlined text-[16px]">add</span>
+          </div>
+          <span>Create</span>
         </button>
 
         <button
           onClick={() => setActiveTab('saved')}
-          className={`relative flex flex-col items-center gap-0.5 text-[10px] font-semibold ${
-            activeTab === 'saved' ? 'text-rose-600' : 'text-stone-500'
+          className={`relative flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
+            activeTab === 'saved' ? 'text-[#9f3d00]' : 'text-[#594137]'
           }`}
         >
-          <span>❤️</span>
+          <span className="material-symbols-outlined text-[20px]">bookmark</span>
           <span>Saved</span>
           {savedCount > 0 && (
-            <span className="absolute -top-1 right-2 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center">
+            <span className="absolute -top-1 right-2 w-4 h-4 bg-[#9f3d00] text-white rounded-full text-[9px] font-bold flex items-center justify-center">
               {savedCount}
             </span>
           )}
@@ -416,3 +470,4 @@ export default function App() {
     </div>
   );
 }
+

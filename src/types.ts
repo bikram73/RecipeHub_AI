@@ -84,4 +84,15 @@ export interface GroceryItem {
   recipeSource?: string;
 }
 
-export type ActiveTab = 'explore' | 'generator' | 'pantry' | 'planner' | 'groceries' | 'saved';
+export type ActiveTab = 
+  | 'home' 
+  | 'explore' 
+  | 'generator' 
+  | 'ai-kitchen' 
+  | 'pantry' 
+  | 'planner' 
+  | 'groceries' 
+  | 'saved' 
+  | 'create-recipe' 
+  | 'my-recipes' 
+  | 'following';

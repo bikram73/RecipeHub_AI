@@ -1,6 +1,6 @@
 import React from 'react';
-import { ChefHat, Sparkles, Compass, Refrigerator, Calendar, ShoppingBag, Bookmark, Search } from 'lucide-react';
 import { ActiveTab } from '../types';
+import { CHEF_GIRL_AVATAR } from './HomeLandingView';
 
 interface HeaderProps {
   activeTab: ActiveTab;
@@ -9,6 +9,7 @@ interface HeaderProps {
   groceryCount: number;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  onOpenCreateRecipe?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,148 +19,196 @@ export const Header: React.FC<HeaderProps> = ({
   groceryCount,
   searchQuery,
   setSearchQuery,
+  onOpenCreateRecipe,
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+    <header className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(41,35,31,0.04)] border-b border-[#e1bfb2]/30">
+      <div className="h-20 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex items-center justify-between gap-4">
+        
+        {/* Left Side: Brand with Logo & Navigation */}
+        <div className="flex items-center gap-6 lg:gap-8">
           
-          {/* Brand Logo */}
+          {/* Logo with Girl Chef Portrait Emblem */}
           <div 
             id="brand-logo"
-            onClick={() => setActiveTab('explore')}
-            className="flex items-center gap-2.5 cursor-pointer group flex-shrink-0"
+            onClick={() => setActiveTab('home')}
+            className="flex items-center gap-2.5 cursor-pointer group shrink-0"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-amber-600/20 group-hover:scale-105 transition-transform duration-200">
-              <ChefHat className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-lg tracking-tight text-stone-900">RecipeHub</span>
-                <span className="text-xs font-semibold px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 flex items-center gap-0.5">
-                  <Sparkles className="w-3 h-3 text-amber-600" /> AI
-                </span>
-              </div>
-              <p className="text-[10px] text-stone-500 tracking-wide font-medium hidden sm:block">Smart Culinary Studio</p>
-            </div>
-          </div>
-
-          {/* Search bar in header for fast exploration */}
-          <div className="hidden md:flex flex-1 max-w-md mx-2">
-            <div className="relative w-full">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-              <input
-                id="header-search-input"
-                type="text"
-                placeholder="Search 1,000+ recipes, ingredients, or cuisines..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm bg-stone-100/80 hover:bg-stone-100 focus:bg-white text-stone-900 placeholder-stone-400 rounded-full border border-transparent focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
+            <div className="relative">
+              <img
+                src={CHEF_GIRL_AVATAR}
+                alt="RecipeHub AI Logo"
+                className="h-10 w-10 sm:h-11 sm:w-11 rounded-full object-cover ring-2 ring-[#9f3d00]/30 group-hover:scale-105 transition-transform duration-200 shadow-xs"
+                referrerPolicy="no-referrer"
               />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-400 hover:text-stone-600 bg-stone-200 rounded-full w-4 h-4 flex items-center justify-center"
-                >
-                  ×
-                </button>
-              )}
+              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#00685d] rounded-full ring-2 ring-white" />
             </div>
+            <span className="font-serif text-xl sm:text-2xl text-[#201a17] tracking-tight font-bold">
+              RecipeHub <span className="text-[#9f3d00] italic font-serif">AI</span>
+            </span>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="flex items-center gap-1 sm:gap-2">
+          {/* Desktop Navigation Links matching Screenshot */}
+          <nav className="hidden xl:flex items-center gap-2 text-xs sm:text-[13px] font-medium">
             <button
-              id="nav-explore-btn"
+              onClick={() => setActiveTab('home')}
+              className={`transition-colors px-3 py-1.5 rounded-lg cursor-pointer ${
+                activeTab === 'home'
+                  ? 'text-[#9f3d00] font-bold bg-[#fef1ea]'
+                  : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
+              }`}
+            >
+              Home
+            </button>
+
+            <button
               onClick={() => setActiveTab('explore')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`transition-colors px-3 py-1.5 rounded-lg cursor-pointer ${
                 activeTab === 'explore'
-                  ? 'bg-amber-50 text-amber-900 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
+                  ? 'text-[#9f3d00] font-bold bg-[#fef1ea]'
+                  : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
               }`}
             >
-              <Compass className="w-4 h-4 text-amber-600" />
-              <span className="hidden lg:inline">Explore</span>
+              Explore
             </button>
 
             <button
-              id="nav-generator-btn"
-              onClick={() => setActiveTab('generator')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === 'generator'
-                  ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20 font-semibold'
-                  : 'text-stone-700 hover:bg-amber-50 hover:text-amber-800'
+              onClick={() => {
+                if (onOpenCreateRecipe) onOpenCreateRecipe();
+                else setActiveTab('create-recipe');
+              }}
+              className={`transition-colors px-3 py-1.5 rounded-lg cursor-pointer ${
+                activeTab === 'create-recipe'
+                  ? 'text-[#9f3d00] font-bold bg-[#fef1ea]'
+                  : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
               }`}
             >
-              <Sparkles className={`w-4 h-4 ${activeTab === 'generator' ? 'text-white animate-pulse' : 'text-amber-500'}`} />
-              <span className="hidden sm:inline">AI Kitchen</span>
+              Create Recipe
             </button>
 
             <button
-              id="nav-pantry-btn"
-              onClick={() => setActiveTab('pantry')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === 'pantry'
-                  ? 'bg-amber-50 text-amber-900 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
+              onClick={() => setActiveTab('my-recipes')}
+              className={`transition-colors px-3 py-1.5 rounded-lg cursor-pointer ${
+                activeTab === 'my-recipes'
+                  ? 'text-[#9f3d00] font-bold bg-[#fef1ea]'
+                  : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
               }`}
             >
-              <Refrigerator className="w-4 h-4 text-emerald-600" />
-              <span className="hidden lg:inline">Pantry Match</span>
+              My Recipes
             </button>
 
             <button
-              id="nav-planner-btn"
-              onClick={() => setActiveTab('planner')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === 'planner'
-                  ? 'bg-amber-50 text-amber-900 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-              }`}
-            >
-              <Calendar className="w-4 h-4 text-blue-600" />
-              <span className="hidden xl:inline">Meal Plan</span>
-            </button>
-
-            <button
-              id="nav-groceries-btn"
-              onClick={() => setActiveTab('groceries')}
-              className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === 'groceries'
-                  ? 'bg-amber-50 text-amber-900 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-              }`}
-            >
-              <ShoppingBag className="w-4 h-4 text-purple-600" />
-              <span className="hidden xl:inline">Grocery</span>
-              {groceryCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-purple-600 text-white text-[11px] font-bold flex items-center justify-center">
-                  {groceryCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              id="nav-saved-btn"
               onClick={() => setActiveTab('saved')}
-              className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`relative transition-colors px-3 py-1.5 rounded-lg cursor-pointer ${
                 activeTab === 'saved'
-                  ? 'bg-amber-50 text-amber-900 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
+                  ? 'text-[#9f3d00] font-bold bg-[#fef1ea]'
+                  : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
               }`}
             >
-              <Bookmark className="w-4 h-4 text-rose-500" />
-              <span className="hidden xl:inline">Saved</span>
+              Saved Collections
               {savedCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-rose-500 text-white text-[11px] font-bold flex items-center justify-center">
+                <span className="ml-1.5 px-1.5 py-0.2 bg-[#9f3d00] text-white text-[10px] rounded-full font-bold">
                   {savedCount}
                 </span>
               )}
             </button>
+
+            <button
+              onClick={() => setActiveTab('following')}
+              className={`transition-colors px-3 py-1.5 rounded-lg cursor-pointer ${
+                activeTab === 'following'
+                  ? 'text-[#9f3d00] font-bold bg-[#fef1ea]'
+                  : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
+              }`}
+            >
+              Following
+            </button>
+
+            <button
+              onClick={() => setActiveTab('generator')}
+              className={`transition-colors flex items-center gap-1 px-3 py-1.5 rounded-lg cursor-pointer ${
+                activeTab === 'generator' || activeTab === 'ai-kitchen'
+                  ? 'text-[#9f3d00] font-bold bg-[#fef1ea]'
+                  : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
+              }`}
+            >
+              <span>AI Kitchen</span>
+              <span className="material-symbols-outlined text-[#9f3d00] text-[18px]">auto_awesome</span>
+            </button>
           </nav>
 
         </div>
+
+        {/* Right Side: Search, Theme Mode, Profile */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          
+          {/* Header Search Input */}
+          <div className="relative hidden md:flex items-center">
+            <span className="material-symbols-outlined absolute left-3.5 text-[#594137] pointer-events-none text-[18px]">
+              search
+            </span>
+            <input
+              id="header-search-input"
+              type="text"
+              placeholder="Search dishes, spices, chefs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  setActiveTab('explore');
+                }
+              }}
+              className="w-52 lg:w-64 bg-[#fef1ea] pl-10 pr-4 py-2 rounded-xl text-xs text-[#201a17] placeholder:text-[#8d7165] outline-none focus:bg-white focus:ring-1 focus:ring-[#9f3d00] transition-all font-medium"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 text-xs text-stone-400 hover:text-stone-700 bg-stone-200 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer"
+              >
+                ×
+              </button>
+            )}
+          </div>
+
+          {/* Quick Search Button on Mobile */}
+          <button 
+            onClick={() => setActiveTab('explore')}
+            aria-label="Search Recipes" 
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-[#fef1ea] text-[#594137] hover:bg-[#f8ece5] transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[18px]">search</span>
+          </button>
+
+          {/* Light/Dark Mode Toggle Icon */}
+          <button 
+            aria-label="Toggle Dark/Light Mode" 
+            onClick={() => alert("Light mode active with warm kitchen ambiance.")}
+            className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#fef1ea] text-[#594137] hover:bg-[#f8ece5] hover:text-[#201a17] transition-colors cursor-pointer shadow-xs"
+          >
+            <span className="material-symbols-outlined text-[18px]">light_mode</span>
+          </button>
+
+          {/* Girl Chef Profile Avatar */}
+          <div className="flex items-center pl-1">
+            <div 
+              onClick={() => setActiveTab('my-recipes')}
+              className="relative cursor-pointer group"
+              title="Chef Clara Profile"
+            >
+              <img
+                src={CHEF_GIRL_AVATAR}
+                alt="Chef Clara"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-white shadow-xs group-hover:ring-[#9f3d00]/50 transition-all"
+                referrerPolicy="no-referrer"
+              />
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#00685d] rounded-full ring-2 ring-white" title="Active Home Sommelier" />
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </header>
   );
 };
+
