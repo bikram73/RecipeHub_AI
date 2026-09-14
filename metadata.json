@@ -1,0 +1,7 @@
+{
+  "name": "RecipeHub AI",
+  "description": "AI-powered culinary discovery, smart recipe generator, step-by-step cooking companion, and meal planner.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
