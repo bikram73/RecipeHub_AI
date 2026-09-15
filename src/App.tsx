@@ -270,9 +270,12 @@ export default function App() {
         {activeTab === 'home' && (
           <HomeLandingView
             recipes={recipes}
+            savedRecipeIds={new Set(recipes.filter(r => r.isSaved).map(r => r.id))}
+            onSearch={(query) => setSearchQuery(query)}
             onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
             onToggleSave={handleToggleSave}
             onStartCooking={handleStartCooking}
+            onOpenCreateRecipe={() => setIsCreateModalOpen(true)}
             onNavigate={(tab) => {
               if (tab === 'create-recipe') {
                 setIsCreateModalOpen(true);

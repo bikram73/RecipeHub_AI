@@ -1,6 +1,6 @@
 import React from 'react';
+import { ChefHat, Sparkles } from 'lucide-react';
 import { ActiveTab } from '../types';
-import { CHEF_GIRL_AVATAR } from './HomeLandingView';
 
 interface HeaderProps {
   activeTab: ActiveTab;
@@ -28,27 +28,22 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Left Side: Brand with Logo & Navigation */}
         <div className="flex items-center gap-6 lg:gap-8">
           
-          {/* Logo with Girl Chef Portrait Emblem */}
+          {/* Refined Brand Logo */}
           <div 
             id="brand-logo"
             onClick={() => setActiveTab('home')}
-            className="flex items-center gap-2.5 cursor-pointer group shrink-0"
+            className="flex items-center gap-3 cursor-pointer group shrink-0"
           >
-            <div className="relative">
-              <img
-                src={CHEF_GIRL_AVATAR}
-                alt="RecipeHub AI Logo"
-                className="h-10 w-10 sm:h-11 sm:w-11 rounded-full object-cover ring-2 ring-[#9f3d00]/30 group-hover:scale-105 transition-transform duration-200 shadow-xs"
-                referrerPolicy="no-referrer"
-              />
-              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#00685d] rounded-full ring-2 ring-white" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#9f3d00] to-[#c74e00] flex items-center justify-center text-white shadow-md shadow-[#9f3d00]/25 group-hover:scale-105 transition-all duration-200">
+              <ChefHat className="w-5 h-5 text-white" />
             </div>
-            <span className="font-serif text-xl sm:text-2xl text-[#201a17] tracking-tight font-bold">
-              RecipeHub <span className="text-[#9f3d00] italic font-serif">AI</span>
+            <span className="font-serif text-xl sm:text-2xl text-[#201a17] tracking-tight font-bold flex items-center gap-1">
+              <span>RecipeHub</span>
+              <span className="text-[#9f3d00] italic font-serif">AI</span>
             </span>
           </div>
 
-          {/* Desktop Navigation Links matching Screenshot */}
+          {/* Desktop Navigation Links */}
           <nav className="hidden xl:flex items-center gap-2 text-xs sm:text-[13px] font-medium">
             <button
               onClick={() => setActiveTab('home')}
@@ -133,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <span>AI Kitchen</span>
-              <span className="material-symbols-outlined text-[#9f3d00] text-[18px]">auto_awesome</span>
+              <Sparkles className="w-3.5 h-3.5 text-[#9f3d00]" />
             </button>
           </nav>
 
@@ -188,21 +183,15 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="material-symbols-outlined text-[18px]">light_mode</span>
           </button>
 
-          {/* Girl Chef Profile Avatar */}
+          {/* User Profile Avatar */}
           <div className="flex items-center pl-1">
-            <div 
+            <button 
               onClick={() => setActiveTab('my-recipes')}
-              className="relative cursor-pointer group"
-              title="Chef Clara Profile"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-[#ffdbcd] to-[#ffdcc4] text-[#9f3d00] font-bold text-xs flex items-center justify-center ring-2 ring-white shadow-xs hover:ring-[#9f3d00]/40 transition-all cursor-pointer"
+              title="Chef Profile & Studio"
             >
-              <img
-                src={CHEF_GIRL_AVATAR}
-                alt="Chef Clara"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-white shadow-xs group-hover:ring-[#9f3d00]/50 transition-all"
-                referrerPolicy="no-referrer"
-              />
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#00685d] rounded-full ring-2 ring-white" title="Active Home Sommelier" />
-            </div>
+              <span>CL</span>
+            </button>
           </div>
 
         </div>

@@ -8,9 +8,9 @@ interface HomeLandingViewProps {
   onSelectRecipe: (recipe: Recipe) => void;
   onStartCooking: (recipe: Recipe, e?: React.MouseEvent) => void;
   onToggleSave: (recipeId: string, e?: React.MouseEvent) => void;
-  savedRecipeIds: Set<string>;
+  savedRecipeIds?: Set<string>;
   recipes: Recipe[];
-  onSearch: (query: string) => void;
+  onSearch?: (query: string) => void;
   onOpenCreateRecipe?: () => void;
 }
 
@@ -19,7 +19,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
   onSelectRecipe,
   onStartCooking,
   onToggleSave,
-  savedRecipeIds,
+  savedRecipeIds = new Set<string>(),
   recipes,
   onSearch,
   onOpenCreateRecipe,
@@ -55,19 +55,19 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchInput.trim()) {
-      onSearch(searchInput.trim());
+      onSearch?.(searchInput.trim());
       onNavigate('explore');
     }
   };
 
   const handleTagClick = (tag: string) => {
     const cleaned = tag.replace('#', '');
-    onSearch(cleaned);
+    onSearch?.(cleaned);
     onNavigate('explore');
   };
 
   const handleCategoryClick = (category: string) => {
-    onSearch(category);
+    onSearch?.(category);
     onNavigate('explore');
   };
 
@@ -553,12 +553,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
               {/* Micro Proof Metric Row */}
               <div className="flex items-center gap-4 pt-3">
                 <div className="flex items-center -space-x-2">
-                  <img
-                    src={CHEF_GIRL_AVATAR}
-                    alt="Chef Clara"
-                    className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-xs"
-                    referrerPolicy="no-referrer"
-                  />
+                  <span className="w-8 h-8 rounded-full bg-[#ffb596] flex items-center justify-center text-[#7c2e00] font-bold text-xs shadow-xs border-2 border-white">CL</span>
                   <span className="w-8 h-8 rounded-full bg-[#ffdbcd] flex items-center justify-center text-[#9f3d00] font-bold text-xs shadow-xs border-2 border-white">SR</span>
                   <span className="w-8 h-8 rounded-full bg-[#8cf5e4] flex items-center justify-center text-[#00685d] font-bold text-xs shadow-xs border-2 border-white">ER</span>
                   <span className="w-8 h-8 rounded-full bg-[#ffdcc4] flex items-center justify-center text-[#8e4e14] font-bold text-xs shadow-xs border-2 border-white">ML</span>
