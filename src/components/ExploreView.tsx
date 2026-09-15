@@ -98,16 +98,26 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const filteredRecipes = useMemo(() => {
     return recipes
       .filter((recipe) => {
-        // Search query
+        // Search query (matches title, description, cuisine, ingredients, tags, and creator name)
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase();
           const matchesTitle = recipe.title.toLowerCase().includes(q);
+          const matchesDescription = recipe.description?.toLowerCase().includes(q) || false;
           const matchesCuisine = recipe.cuisine.toLowerCase().includes(q);
-          const matchesTags = recipe.tags?.some((t) => t.toLowerCase().includes(q));
+          const matchesTags = recipe.tags?.some((t) => t.toLowerCase().includes(q)) || false;
           const matchesIngredients = recipe.ingredients?.some((i) =>
             i.name.toLowerCase().includes(q)
-          );
-          if (!matchesTitle && !matchesCuisine && !matchesTags && !matchesIngredients) {
+          ) || false;
+          const matchesCreator = recipe.author?.name?.toLowerCase().includes(q) || false;
+
+          if (
+            !matchesTitle && 
+            !matchesDescription && 
+            !matchesCuisine && 
+            !matchesTags && 
+            !matchesIngredients && 
+            !matchesCreator
+          ) {
             return false;
           }
         }

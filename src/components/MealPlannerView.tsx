@@ -38,17 +38,19 @@ export const MealPlannerView: React.FC<MealPlannerViewProps> = ({
 
   const [toastMessage, setToastMessage] = useState<string>('');
 
-  const currentDay = mealPlan[selectedDayIndex] || mealPlan[0];
+  const currentDay = (mealPlan && mealPlan.length > 0) 
+    ? (mealPlan[selectedDayIndex] || mealPlan[0]) 
+    : { day: 'Monday' as const, dateStr: 'Today', meals: {} };
 
   // Calculate daily totals for selected day
-  const mealsList = Object.values(currentDay.meals) as (Recipe | undefined)[];
+  const mealsList = currentDay?.meals ? (Object.values(currentDay.meals) as (Recipe | undefined)[]) : [];
   const dailyNutrition = mealsList.reduce(
     (acc, meal) => {
-      if (meal) {
-        acc.calories += meal.nutrition.calories;
-        acc.protein += meal.nutrition.protein;
-        acc.carbs += meal.nutrition.carbs;
-        acc.fat += meal.nutrition.fat;
+      if (meal && meal.nutrition) {
+        acc.calories += meal.nutrition.calories || 0;
+        acc.protein += meal.nutrition.protein || 0;
+        acc.carbs += meal.nutrition.carbs || 0;
+        acc.fat += meal.nutrition.fat || 0;
       }
       return acc;
     },
@@ -57,12 +59,14 @@ export const MealPlannerView: React.FC<MealPlannerViewProps> = ({
 
   const handleGenerateGroceries = () => {
     const allIngredients: Ingredient[] = [];
-    mealPlan.forEach((day) => {
-      (Object.values(day.meals) as (Recipe | undefined)[]).forEach((meal) => {
-        if (meal) {
-          allIngredients.push(...meal.ingredients);
-        }
-      });
+    (mealPlan || []).forEach((day) => {
+      if (day?.meals) {
+        (Object.values(day.meals) as (Recipe | undefined)[]).forEach((meal) => {
+          if (meal && meal.ingredients) {
+            allIngredients.push(...meal.ingredients);
+          }
+        });
+      }
     });
 
     onGenerateGroceriesFromPlan(allIngredients);

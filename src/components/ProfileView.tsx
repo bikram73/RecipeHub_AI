@@ -95,9 +95,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 -mt-16 mb-6">
             <div className="flex items-end gap-5">
               <div className="w-28 h-28 rounded-3xl overflow-hidden ring-4 ring-white shadow-xl bg-gradient-to-tr from-[#ffdbcd] to-[#ffdcc4] text-[#9f3d00] font-serif font-bold text-3xl flex items-center justify-center shrink-0">
-                {profile.name
+                {(profile?.name || 'Chef')
                   .split(' ')
-                  .map((n) => n[0])
+                  .filter(Boolean)
+                  .map((n) => n.charAt(0))
                   .join('')
                   .slice(0, 2)
                   .toUpperCase() || 'CH'}

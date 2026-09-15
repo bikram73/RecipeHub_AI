@@ -1,5 +1,5 @@
 import { Recipe, LocalProfile } from '../types';
-import { getHistory, getSavedRecipes } from '../utils/storage';
+import { getProfile, getHistory, getSavedRecipes } from '../utils/storage';
 
 export interface ScoredRecipe {
   recipe: Recipe;
@@ -8,44 +8,50 @@ export interface ScoredRecipe {
 }
 
 /**
- * Calculates a local personalized recommendation score for each recipe based on:
- * - Profile favorite cuisines (+5 per match)
- * - Dietary preferences (+5 per match)
- * - Cooking level appropriateness (+2 per match)
- * - Similarity to saved recipes (+4)
- * - Similarity to recently viewed recipes (+3)
- * - Community Rating (>4.5 gives +2)
+ * Calculates a local personalized recommendation score based on:
+ * - Cuisine match (+5)
+ * - Dietary preference match (+5)
+ * - Saved recipe cuisine/tag similarity (+4)
+ * - Recently viewed recipes similarity (+3)
+ * - High rating > 4.7 (+2)
+ * - Popularity / review count (+1 to +3)
  */
 export function getPersonalizedRecommendations(
-  recipes: Recipe[],
-  profile: LocalProfile,
+  allRecipes: Recipe[],
   limit: number = 8
 ): ScoredRecipe[] {
-  const historyIds = new Set(getHistory());
-  const savedIds = new Set(getSavedRecipes());
-  
-  // Find cuisines from saved & viewed recipes
-  const interactedCuisines = new Set<string>();
-  recipes.forEach(r => {
-    if (savedIds.has(r.id) || historyIds.has(r.id)) {
-      interactedCuisines.add(r.cuisine.toLowerCase());
-    }
-  });
+  const profile: LocalProfile = getProfile();
+  const historyIds: string[] = getHistory();
+  const savedIds: string[] = getSavedRecipes();
 
-  const scored: ScoredRecipe[] = recipes.map(recipe => {
+  // Find saved recipes to extract preferred tags and cuisines
+  const savedRecipes = (allRecipes || []).filter((r) => r && savedIds.includes(r.id));
+  const savedCuisines = new Set(savedRecipes.map((r) => (r.cuisine || '').toLowerCase()).filter(Boolean));
+  const savedTags = new Set(savedRecipes.flatMap((r) => (r.tags || []).map((t) => t.toLowerCase())));
+
+  // Find recently viewed recipes
+  const viewedRecipes = (allRecipes || []).filter((r) => r && historyIds.includes(r.id));
+  const viewedCuisines = new Set(viewedRecipes.map((r) => (r.cuisine || '').toLowerCase()).filter(Boolean));
+
+  const scored: ScoredRecipe[] = (allRecipes || []).map((recipe) => {
     let score = 0;
     const matchReasons: string[] = [];
-    const recipeCuisine = recipe.cuisine.toLowerCase();
+    const recipeCuisine = (recipe?.cuisine || '').toLowerCase();
 
-    // 1. Cuisine Match (+5)
-    if (profile.favoriteCuisines.some(c => recipeCuisine.includes(c.toLowerCase()))) {
+    // 1. Favorite Cuisine Match (+5)
+    const matchesFavCuisine = profile?.favoriteCuisines?.some(
+      (c) => (c || '').toLowerCase() === recipeCuisine
+    );
+    if (matchesFavCuisine && recipe.cuisine) {
       score += 5;
-      matchReasons.push(`Matches your love for ${recipe.cuisine}`);
+      matchReasons.push(`Matches your favorite cuisine (${recipe.cuisine})`);
     }
 
-    // 2. Dietary Match (+5)
-    if (profile.diet && profile.diet !== 'No Preference') {
-      const matchesDiet = recipe.dietary?.some(d => d.toLowerCase().includes(profile.diet.toLowerCase()));
+    // 2. Dietary Preference Match (+5)
+    if (profile?.diet && profile.diet !== 'No Preference') {
+      const matchesDiet = recipe.dietary?.some(
+        (d) => (d || '').toLowerCase() === (profile.diet || '').toLowerCase()
+      );
       if (matchesDiet) {
         score += 5;
         matchReasons.push(`Fits your ${profile.diet} diet`);
@@ -53,40 +59,53 @@ export function getPersonalizedRecommendations(
     }
 
     // 3. Saved Recipe Similarity (+4)
-    if (interactedCuisines.has(recipeCuisine) && !savedIds.has(recipe.id)) {
+    if (recipeCuisine && savedCuisines.has(recipeCuisine) && !savedIds.includes(recipe.id)) {
       score += 4;
-      matchReasons.push(`Similar to your saved favorites`);
+      if (!matchReasons.some((r) => r.includes('cuisine'))) {
+        matchReasons.push(`Similar to recipes you saved in ${recipe.cuisine}`);
+      }
     }
 
-    // 4. Viewed Recipe Similarity (+3)
-    if (historyIds.has(recipe.id)) {
-      score += 1; // minor recency boost
-    } else if (interactedCuisines.has(recipeCuisine)) {
+    const tagOverlap = recipe.tags?.filter((t) => savedTags.has((t || '').toLowerCase())).length || 0;
+    if (tagOverlap > 0) {
+      score += Math.min(tagOverlap * 1.5, 4);
+    }
+
+    // 4. Recently Viewed Cuisine Match (+3)
+    if (recipeCuisine && viewedCuisines.has(recipeCuisine) && !historyIds.includes(recipe.id)) {
       score += 3;
+      if (matchReasons.length < 2) {
+        matchReasons.push(`Based on your recent browsing`);
+      }
     }
 
-    // 5. Rating boost (+2 if >= 4.8, +1 if >= 4.5)
-    if (recipe.rating >= 4.8) {
+    // 5. Rating Score (+2 for high ratings)
+    const rRating = recipe.rating || 0;
+    if (rRating >= 4.8) {
+      score += 3;
+    } else if (rRating >= 4.5) {
+      score += 1.5;
+    }
+
+    // 6. Popularity Boost (+1 to +2)
+    const rReviews = recipe.reviewCount || 0;
+    if (rReviews > 200) {
       score += 2;
-      matchReasons.push(`Community top rated (${recipe.rating}★)`);
-    } else if (recipe.rating >= 4.5) {
+    } else if (rReviews > 80) {
       score += 1;
     }
 
-    // 6. Cooking Level match (+2)
-    if (
-      (profile.cookingLevel === 'Beginner' && recipe.difficulty === 'Easy') ||
-      (profile.cookingLevel === 'Intermediate' && (recipe.difficulty === 'Easy' || recipe.difficulty === 'Medium')) ||
-      (profile.cookingLevel === 'Advanced' && recipe.difficulty === 'Hard')
-    ) {
+    // 7. Cooking level alignment
+    if (profile?.cookingLevel === 'Beginner' && recipe.difficulty === 'Easy') {
       score += 2;
-      matchReasons.push(`Tailored to ${profile.cookingLevel} level`);
+      if (matchReasons.length < 2) {
+        matchReasons.push(`Beginner-friendly step-by-step`);
+      }
     }
 
-    // Baseline fallback reason if empty
+    // Fallback reason if none matched
     if (matchReasons.length === 0) {
-      matchReasons.push(`Trending seasonal choice`);
-      score += 1;
+      matchReasons.push(`Trending in ${recipe.cuisine || 'World Cuisine'}`);
     }
 
     return {
@@ -96,7 +115,7 @@ export function getPersonalizedRecommendations(
     };
   });
 
-  // Sort descending by score
+  // Sort descending by calculated score
   return scored
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);

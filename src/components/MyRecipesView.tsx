@@ -57,9 +57,10 @@ export const MyRecipesView: React.FC<MyRecipesViewProps> = ({
       <div className="rounded-3xl bg-gradient-to-r from-[#fef1ea] via-white to-[#f8ece5] border border-[#e1bfb2]/40 p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 shadow-xs">
         <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
           <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-[#ffdbcd] to-[#ffdcc4] text-[#9f3d00] font-serif font-bold text-3xl flex items-center justify-center shrink-0 shadow-md ring-4 ring-white">
-            {profile.name
+            {(profile?.name || 'Chef')
               .split(' ')
-              .map((n) => n[0])
+              .filter(Boolean)
+              .map((n) => n.charAt(0))
               .join('')
               .slice(0, 2)
               .toUpperCase() || 'CH'}

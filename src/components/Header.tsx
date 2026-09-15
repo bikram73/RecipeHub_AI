@@ -26,14 +26,13 @@ export const Header: React.FC<HeaderProps> = ({
   const profile: LocalProfile = getProfile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const initials = profile.name
-    ? profile.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-    : 'CH';
+  const initials = (profile?.name || 'Chef')
+    .split(' ')
+    .filter(Boolean)
+    .map((n) => n.charAt(0))
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'CH';
 
   const navLinks = [
     { id: 'home', label: 'Home', icon: Home },

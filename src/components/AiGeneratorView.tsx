@@ -470,14 +470,16 @@ export const AiGeneratorView: React.FC<AiGeneratorViewProps> = ({
                   </div>
 
                   {/* Steps Preview */}
-                  <div>
-                    <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-                      Method Highlights ({generatedRecipe.steps.length} Steps)
-                    </h4>
-                    <p className="text-xs text-stone-600 line-clamp-2 italic bg-amber-50/60 p-2 rounded-xl border border-amber-200/50">
-                      "Step 1: {generatedRecipe.steps[0].instruction}"
-                    </p>
-                  </div>
+                  {generatedRecipe.steps && generatedRecipe.steps.length > 0 && (
+                    <div>
+                      <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                        Method Highlights ({generatedRecipe.steps.length} Steps)
+                      </h4>
+                      <p className="text-xs text-stone-600 line-clamp-2 italic bg-amber-50/60 p-2 rounded-xl border border-amber-200/50">
+                        "Step 1: {generatedRecipe.steps[0]?.instruction || 'Get ingredients ready.'}"
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
