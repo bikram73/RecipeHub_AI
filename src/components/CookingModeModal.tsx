@@ -14,6 +14,7 @@ import {
   ListOrdered,
   ChefHat
 } from 'lucide-react';
+import { logActivity } from '../utils/storage';
 
 interface CookingModeModalProps {
   recipe: Recipe | null;
@@ -113,6 +114,13 @@ export const CookingModeModal: React.FC<CookingModeModalProps> = ({
       setCurrentStepIndex(prev => prev + 1);
     } else {
       setIsCompleted(true);
+      logActivity({
+        type: 'cooked_recipe',
+        title: 'Prepared Dish in Cook Mode',
+        description: `Completed step-by-step preparation of "${recipe.title}"`,
+        recipeId: recipe.id,
+        recipeTitle: recipe.title,
+      });
     }
   };
 

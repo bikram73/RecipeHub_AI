@@ -5,40 +5,49 @@ import {
   MealPlanDay, 
   GroceryItem, 
   ActiveTab, 
-  Ingredient 
+  Ingredient,
+  Creator
 } from './types';
 import { INITIAL_RECIPES, INITIAL_PANTRY_ITEMS } from './data/mockRecipes';
 import { Header } from './components/Header';
 import { HomeLandingView } from './components/HomeLandingView';
 import { ExploreView } from './components/ExploreView';
-import { AiGeneratorView } from './components/AiGeneratorView';
+import { AiKitchenView } from './components/AiKitchenView';
 import { PantryView } from './components/PantryView';
 import { MealPlannerView } from './components/MealPlannerView';
 import { GroceryListView } from './components/GroceryListView';
 import { SavedCollectionsView } from './components/SavedCollectionsView';
 import { MyRecipesView } from './components/MyRecipesView';
 import { FollowingView } from './components/FollowingView';
-import { CreateRecipeModal } from './components/CreateRecipeModal';
+import { ProfileView } from './components/ProfileView';
+import { ActivityView } from './components/ActivityView';
+import { SettingsView } from './components/SettingsView';
+import { CreateEditRecipeModal } from './components/CreateEditRecipeModal';
 import { RecipeDetailModal } from './components/RecipeDetailModal';
 import { CookingModeModal } from './components/CookingModeModal';
+import { AddToCollectionModal } from './components/AddToCollectionModal';
+import { DeleteConfirmModal } from './components/DeleteConfirmModal';
+import { CreatorProfileModal } from './components/CreatorProfileModal';
+import { OnboardingModal } from './components/OnboardingModal';
+import { getStoredRecipes, saveStoredRecipes, logActivity } from './utils/storage';
 
 export default function App() {
-  // Navigation State - default to the new Landing Page ('home')
+  // Navigation State
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+
+  // Modals
+  const [isCreateEditModalOpen, setIsCreateEditModalOpen] = useState<boolean>(false);
+  const [recipeToEdit, setRecipeToEdit] = useState<Recipe | null>(null);
+  const [selectedRecipeForDetail, setSelectedRecipeForDetail] = useState<Recipe | null>(null);
+  const [activeCookingRecipe, setActiveCookingRecipe] = useState<Recipe | null>(null);
+  const [recipeForCollection, setRecipeForCollection] = useState<Recipe | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
 
   // Core Data States
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
-    const saved = localStorage.getItem('recipehub_recipes');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return INITIAL_RECIPES;
-      }
-    }
-    return INITIAL_RECIPES;
+    return getStoredRecipes(INITIAL_RECIPES);
   });
 
   const [pantryItems, setPantryItems] = useState<PantryItem[]>(() => {
@@ -95,13 +104,9 @@ export default function App() {
     ];
   });
 
-  // Modals
-  const [selectedRecipeForDetail, setSelectedRecipeForDetail] = useState<Recipe | null>(null);
-  const [activeCookingRecipe, setActiveCookingRecipe] = useState<Recipe | null>(null);
-
   // Sync to local storage
   useEffect(() => {
-    localStorage.setItem('recipehub_recipes', JSON.stringify(recipes));
+    saveStoredRecipes(recipes);
   }, [recipes]);
 
   useEffect(() => {
@@ -119,16 +124,28 @@ export default function App() {
   // Recipe actions
   const handleToggleSave = (recipeId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    setRecipes(prev => prev.map(r => {
-      if (r.id === recipeId) {
-        const updated = { ...r, isSaved: !r.isSaved };
-        if (selectedRecipeForDetail?.id === recipeId) {
-          setSelectedRecipeForDetail(updated);
-        }
-        return updated;
+    setRecipes((prev) => {
+      const target = prev.find((r) => r.id === recipeId);
+      if (target) {
+        logActivity({
+          type: 'saved_recipe',
+          title: target.isSaved ? 'Removed from Bookmarks' : 'Saved Recipe',
+          description: `"${target.title}"`,
+          recipeId: target.id,
+          recipeTitle: target.title,
+        });
       }
-      return r;
-    }));
+      return prev.map((r) => {
+        if (r.id === recipeId) {
+          const updated = { ...r, isSaved: !r.isSaved };
+          if (selectedRecipeForDetail?.id === recipeId) {
+            setSelectedRecipeForDetail(updated);
+          }
+          return updated;
+        }
+        return r;
+      });
+    });
   };
 
   const handleStartCooking = (recipe: Recipe, e?: React.MouseEvent) => {
@@ -137,13 +154,50 @@ export default function App() {
     setActiveCookingRecipe(recipe);
   };
 
-  const handleRecipeGenerated = (newRecipe: Recipe) => {
-    setRecipes(prev => [newRecipe, ...prev]);
+  const handleSaveRecipe = (recipeData: Recipe) => {
+    setRecipes((prev) => {
+      const exists = prev.some((r) => r.id === recipeData.id);
+      if (exists) {
+        logActivity({
+          type: 'created_recipe',
+          title: 'Updated Recipe',
+          description: `Edited "${recipeData.title}"`,
+          recipeId: recipeData.id,
+          recipeTitle: recipeData.title,
+        });
+        return prev.map((r) => (r.id === recipeData.id ? recipeData : r));
+      } else {
+        logActivity({
+          type: 'created_recipe',
+          title: 'Created New Recipe',
+          description: `Published "${recipeData.title}"`,
+          recipeId: recipeData.id,
+          recipeTitle: recipeData.title,
+        });
+        return [recipeData, ...prev];
+      }
+    });
+
+    setIsCreateEditModalOpen(false);
+    setRecipeToEdit(null);
   };
 
-  const handleSaveCustomRecipe = (customRecipe: Recipe) => {
-    setRecipes(prev => [customRecipe, ...prev]);
-    setActiveTab('my-recipes');
+  const handleDeleteRecipe = (recipeId: string) => {
+    const target = recipes.find((r) => r.id === recipeId);
+    setRecipes((prev) => prev.filter((r) => r.id !== recipeId));
+    if (target) {
+      logActivity({
+        type: 'deleted_recipe',
+        title: 'Deleted Recipe',
+        description: `Removed "${target.title}"`,
+        recipeId: target.id,
+        recipeTitle: target.title,
+      });
+    }
+    setDeleteTarget(null);
+    if (selectedRecipeForDetail?.id === recipeId) {
+      setSelectedRecipeForDetail(null);
+    }
   };
 
   // Grocery actions
@@ -167,13 +221,20 @@ export default function App() {
       };
     });
 
-    setGroceryItems(prev => [...newItems, ...prev]);
+    setGroceryItems((prev) => [...newItems, ...prev]);
+    logActivity({
+      type: 'grocery_updated',
+      title: 'Added to Grocery Bag',
+      description: `Added ${ingredients.length} items from ${recipeTitle || 'recipe'}`,
+    });
   };
 
   const handleToggleGroceryItem = (id: string) => {
-    setGroceryItems(prev => prev.map(item => 
-      item.id === id ? { ...item, completed: !item.completed } : item
-    ));
+    setGroceryItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, completed: !item.completed } : item
+      )
+    );
   };
 
   const handleAddGroceryItem = (name: string, amount: string, category: GroceryItem['category']) => {
@@ -184,22 +245,24 @@ export default function App() {
       category,
       completed: false,
     };
-    setGroceryItems(prev => [newItem, ...prev]);
+    setGroceryItems((prev) => [newItem, ...prev]);
   };
 
   const handleDeleteGroceryItem = (id: string) => {
-    setGroceryItems(prev => prev.filter(i => i.id !== id));
+    setGroceryItems((prev) => prev.filter((i) => i.id !== id));
   };
 
   const handleClearCompletedGrocery = () => {
-    setGroceryItems(prev => prev.filter(i => !i.completed));
+    setGroceryItems((prev) => prev.filter((i) => !i.completed));
   };
 
   // Pantry actions
   const handleTogglePantryItem = (id: string) => {
-    setPantryItems(prev => prev.map(item => 
-      item.id === id ? { ...item, inStock: !item.inStock } : item
-    ));
+    setPantryItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, inStock: !item.inStock } : item
+      )
+    );
   };
 
   const handleAddPantryItem = (name: string, category: PantryItem['category']) => {
@@ -209,11 +272,11 @@ export default function App() {
       category,
       inStock: true,
     };
-    setPantryItems(prev => [newItem, ...prev]);
+    setPantryItems((prev) => [newItem, ...prev]);
   };
 
   const handleDeletePantryItem = (id: string) => {
-    setPantryItems(prev => prev.filter(i => i.id !== id));
+    setPantryItems((prev) => prev.filter((i) => i.id !== id));
   };
 
   // Meal Plan actions
@@ -222,63 +285,84 @@ export default function App() {
     mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack', 
     recipe?: Recipe
   ) => {
-    setMealPlan(prev => {
+    setMealPlan((prev) => {
       const copy = [...prev];
       copy[dayIndex] = {
         ...copy[dayIndex],
         meals: {
           ...copy[dayIndex].meals,
           [mealType]: recipe,
-        }
+        },
       };
       return copy;
     });
+    if (recipe) {
+      logActivity({
+        type: 'meal_planned',
+        title: 'Meal Scheduled',
+        description: `Scheduled "${recipe.title}" for ${mealPlan[dayIndex]?.day || 'week'}`,
+        recipeId: recipe.id,
+        recipeTitle: recipe.title,
+      });
+    }
   };
 
   const handleAutoPlanWeek = () => {
-    setMealPlan(prev => prev.map((day, idx) => ({
-      ...day,
-      meals: {
-        breakfast: recipes.find(r => r.category === 'breakfast') || recipes[1],
-        lunch: recipes.find(r => r.category === 'lunch') || recipes[3],
-        dinner: recipes[(idx * 2) % recipes.length],
-        snack: idx % 2 === 0 ? recipes.find(r => r.category === 'dessert') : undefined,
-      }
-    })));
+    setMealPlan((prev) =>
+      prev.map((day, idx) => ({
+        ...day,
+        meals: {
+          breakfast: recipes.find((r) => r.category === 'breakfast') || recipes[1],
+          lunch: recipes.find((r) => r.category === 'lunch') || recipes[3],
+          dinner: recipes[(idx * 2) % recipes.length],
+          snack: idx % 2 === 0 ? recipes.find((r) => r.category === 'dessert') : undefined,
+        },
+      }))
+    );
   };
 
-  const savedCount = recipes.filter(r => r.isSaved).length;
-  const groceryCount = groceryItems.filter(i => !i.completed).length;
+  const savedCount = recipes.filter((r) => r.isSaved).length;
+  const myRecipesCount = recipes.filter(
+    (r) => r.isAiGenerated || r.id.startsWith('user-rec-')
+  ).length;
 
   return (
     <div className="min-h-screen bg-[#faf6f3] text-[#201a17] font-sans flex flex-col selection:bg-[#ffdbcd] selection:text-[#9f3d00]">
-      
+      {/* First-time Onboarding Modal */}
+      <OnboardingModal />
+
       {/* Top Header */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         savedCount={savedCount}
-        groceryCount={groceryCount}
+        myRecipesCount={myRecipesCount}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        onOpenCreateRecipe={() => setIsCreateModalOpen(true)}
+        onOpenCreateRecipe={() => {
+          setRecipeToEdit(null);
+          setIsCreateEditModalOpen(true);
+        }}
       />
 
-      {/* Main Content Area */}
+      {/* Main Content View Switcher */}
       <main className="flex-1 w-full pt-20">
-        
         {activeTab === 'home' && (
           <HomeLandingView
             recipes={recipes}
-            savedRecipeIds={new Set(recipes.filter(r => r.isSaved).map(r => r.id))}
+            savedRecipeIds={new Set(recipes.filter((r) => r.isSaved).map((r) => r.id))}
             onSearch={(query) => setSearchQuery(query)}
             onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
             onToggleSave={handleToggleSave}
             onStartCooking={handleStartCooking}
-            onOpenCreateRecipe={() => setIsCreateModalOpen(true)}
+            onOpenCreateRecipe={() => {
+              setRecipeToEdit(null);
+              setIsCreateEditModalOpen(true);
+            }}
             onNavigate={(tab) => {
               if (tab === 'create-recipe') {
-                setIsCreateModalOpen(true);
+                setRecipeToEdit(null);
+                setIsCreateEditModalOpen(true);
               } else {
                 setActiveTab(tab);
               }
@@ -293,7 +377,7 @@ export default function App() {
               onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
               onToggleSave={handleToggleSave}
               onStartCooking={handleStartCooking}
-              onNavigateToGenerator={() => setActiveTab('generator')}
+              onNavigateToGenerator={() => setActiveTab('ai-kitchen')}
               searchQuery={searchQuery}
             />
           </div>
@@ -301,9 +385,12 @@ export default function App() {
 
         {(activeTab === 'generator' || activeTab === 'ai-kitchen') && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <AiGeneratorView
+            <AiKitchenView
               pantryItems={pantryItems}
-              onRecipeGenerated={handleRecipeGenerated}
+              onRecipeGenerated={(newRec) => {
+                handleSaveRecipe(newRec);
+                setSelectedRecipeForDetail(newRec);
+              }}
               onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
               onStartCooking={handleStartCooking}
               onToggleSave={handleToggleSave}
@@ -333,7 +420,9 @@ export default function App() {
               mealPlan={mealPlan}
               onUpdateMeal={handleUpdateMeal}
               onAutoPlanWeek={handleAutoPlanWeek}
-              onGenerateGroceriesFromPlan={(ings) => handleAddIngredientsToGrocery(ings, 'Weekly Meal Plan')}
+              onGenerateGroceriesFromPlan={(ings) =>
+                handleAddIngredientsToGrocery(ings, 'Weekly Meal Plan')
+              }
               onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
             />
           </div>
@@ -369,7 +458,17 @@ export default function App() {
               recipes={recipes}
               onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
               onStartCooking={handleStartCooking}
-              onOpenCreateRecipe={() => setIsCreateModalOpen(true)}
+              onOpenCreateRecipe={() => {
+                setRecipeToEdit(null);
+                setIsCreateEditModalOpen(true);
+              }}
+              onEditRecipe={(rec) => {
+                setRecipeToEdit(rec);
+                setIsCreateEditModalOpen(true);
+              }}
+              onDeleteRecipe={(id, title) => {
+                setDeleteTarget({ id, title });
+              }}
             />
           </div>
         )}
@@ -377,19 +476,62 @@ export default function App() {
         {activeTab === 'following' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <FollowingView
+              recipes={recipes}
               onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
               onStartCooking={handleStartCooking}
+              onViewCreatorProfile={(c) => setSelectedCreator(c)}
             />
           </div>
         )}
 
+        {activeTab === 'profile' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <ProfileView
+              recipes={recipes}
+              onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
+              onStartCooking={handleStartCooking}
+              onNavigateToTab={(tab) => setActiveTab(tab)}
+              onOpenCreateRecipe={() => {
+                setRecipeToEdit(null);
+                setIsCreateEditModalOpen(true);
+              }}
+            />
+          </div>
+        )}
+
+        {activeTab === 'activity' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <ActivityView
+              onSelectRecipe={(recId) => {
+                const found = recipes.find((r) => r.id === recId);
+                if (found) setSelectedRecipeForDetail(found);
+              }}
+            />
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <SettingsView
+              onClearAllData={() => {
+                setRecipes(INITIAL_RECIPES);
+                setPantryItems(INITIAL_PANTRY_ITEMS);
+                setActiveTab('home');
+              }}
+            />
+          </div>
+        )}
       </main>
 
-      {/* Create Recipe Modal */}
-      {isCreateModalOpen && (
-        <CreateRecipeModal
-          onClose={() => setIsCreateModalOpen(false)}
-          onSaveRecipe={handleSaveCustomRecipe}
+      {/* Unified Create & Edit Recipe Modal */}
+      {isCreateEditModalOpen && (
+        <CreateEditRecipeModal
+          initialRecipe={recipeToEdit}
+          onClose={() => {
+            setIsCreateEditModalOpen(false);
+            setRecipeToEdit(null);
+          }}
+          onSaveRecipe={handleSaveRecipe}
         />
       )}
 
@@ -401,10 +543,50 @@ export default function App() {
           onToggleSave={() => handleToggleSave(selectedRecipeForDetail.id)}
           onStartCooking={(r) => handleStartCooking(r)}
           onAddIngredientsToGrocery={handleAddIngredientsToGrocery}
+          onOpenAddToCollection={(r) => setRecipeForCollection(r)}
+          onEditRecipe={(r) => {
+            setRecipeToEdit(r);
+            setIsCreateEditModalOpen(true);
+          }}
+          onDeleteRecipe={(id, title) => {
+            setDeleteTarget({ id, title });
+          }}
+          onNavigateToAi={() => {
+            setActiveTab('ai-kitchen');
+          }}
         />
       )}
 
-      {/* Full-Screen Distraction-Free Cooking Mode */}
+      {/* Add To Collection Modal */}
+      {recipeForCollection && (
+        <AddToCollectionModal
+          recipe={recipeForCollection}
+          onClose={() => setRecipeForCollection(null)}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <DeleteConfirmModal
+          title={`Delete "${deleteTarget.title}"?`}
+          description="Are you sure you want to delete this recipe from your personal culinary book? This action cannot be undone."
+          onConfirm={() => handleDeleteRecipe(deleteTarget.id)}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
+
+      {/* Creator Profile Modal */}
+      {selectedCreator && (
+        <CreatorProfileModal
+          creator={selectedCreator}
+          recipes={recipes}
+          onClose={() => setSelectedCreator(null)}
+          onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
+          onStartCooking={handleStartCooking}
+        />
+      )}
+
+      {/* Full-Screen Distraction-Free Interactive Cooking Mode */}
       {activeCookingRecipe && (
         <CookingModeModal
           recipe={activeCookingRecipe}
@@ -413,11 +595,11 @@ export default function App() {
       )}
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#e1bfb2]/40 px-3 py-2 flex items-center justify-around">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#e1bfb2]/40 px-2 py-2 flex items-center justify-around shadow-lg">
         <button
           onClick={() => setActiveTab('home')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
-            activeTab === 'home' ? 'text-[#9f3d00]' : 'text-[#594137]'
+            activeTab === 'home' ? 'text-[#9f3d00]' : 'text-gray-500'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">home</span>
@@ -427,7 +609,7 @@ export default function App() {
         <button
           onClick={() => setActiveTab('explore')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
-            activeTab === 'explore' ? 'text-[#9f3d00]' : 'text-[#594137]'
+            activeTab === 'explore' ? 'text-[#9f3d00]' : 'text-gray-500'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">explore</span>
@@ -435,9 +617,11 @@ export default function App() {
         </button>
 
         <button
-          onClick={() => setActiveTab('generator')}
+          onClick={() => setActiveTab('ai-kitchen')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
-            activeTab === 'generator' ? 'text-[#9f3d00]' : 'text-[#594137]'
+            activeTab === 'ai-kitchen' || activeTab === 'generator'
+              ? 'text-[#9f3d00]'
+              : 'text-gray-500'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
@@ -445,10 +629,13 @@ export default function App() {
         </button>
 
         <button
-          onClick={() => setIsCreateModalOpen(true)}
+          onClick={() => {
+            setRecipeToEdit(null);
+            setIsCreateEditModalOpen(true);
+          }}
           className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-[#9f3d00] cursor-pointer"
         >
-          <div className="w-6 h-6 rounded-full bg-[#9f3d00] text-white flex items-center justify-center">
+          <div className="w-6 h-6 rounded-full bg-[#9f3d00] text-white flex items-center justify-center shadow-xs">
             <span className="material-symbols-outlined text-[16px]">add</span>
           </div>
           <span>Create</span>
@@ -457,7 +644,7 @@ export default function App() {
         <button
           onClick={() => setActiveTab('saved')}
           className={`relative flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
-            activeTab === 'saved' ? 'text-[#9f3d00]' : 'text-[#594137]'
+            activeTab === 'saved' ? 'text-[#9f3d00]' : 'text-gray-500'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">bookmark</span>
@@ -468,9 +655,17 @@ export default function App() {
             </span>
           )}
         </button>
-      </div>
 
+        <button
+          onClick={() => setActiveTab('profile')}
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
+            activeTab === 'profile' ? 'text-[#9f3d00]' : 'text-gray-500'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[20px]">person</span>
+          <span>Profile</span>
+        </button>
+      </div>
     </div>
   );
 }
-

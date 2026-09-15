@@ -25,6 +25,28 @@ export interface NutritionInfo {
   sugar?: number;
 }
 
+export interface Comment {
+  id: string;
+  userId?: string;
+  userName?: string;
+  userAvatar?: string;
+  authorName?: string;
+  authorAvatar?: string;
+  text: string;
+  rating?: number;
+  createdAt: string;
+  likes?: number;
+}
+
+export interface RecipeAuthor {
+  id?: string;
+  name: string;
+  avatar: string;
+  role: string;
+  bio?: string;
+  followers?: number;
+}
+
 export interface Recipe {
   id: string;
   title: string;
@@ -32,7 +54,7 @@ export interface Recipe {
   description: string;
   imageUrl: string;
   cuisine: string;
-  category: 'breakfast' | 'lunch' | 'dinner' | 'dessert' | 'snack' | 'drinks' | 'baking';
+  category: 'breakfast' | 'lunch' | 'dinner' | 'dessert' | 'snack' | 'drinks' | 'baking' | 'salad' | 'soup';
   difficulty: 'Easy' | 'Medium' | 'Hard';
   prepTimeMinutes: number;
   cookTimeMinutes: number;
@@ -44,15 +66,92 @@ export interface Recipe {
   nutrition: NutritionInfo;
   ingredients: Ingredient[];
   steps: CookingStep[];
-  author: {
-    name: string;
-    avatar: string;
-    role: string;
-  };
+  author: RecipeAuthor;
   winePairing?: string;
+  chefTips?: string[];
   isAiGenerated?: boolean;
   isSaved?: boolean;
+  isDraft?: boolean;
   featured?: boolean;
+  views?: number;
+  saves?: number;
+  comments?: Comment[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Creator {
+  id: string;
+  name: string;
+  username: string;
+  bio: string;
+  avatar: string;
+  role: string;
+  specialty: string;
+  badge: string;
+  recipesCount: number;
+  followersCount: number;
+  rating: number;
+}
+
+export interface Collection {
+  id: string;
+  name: string;
+  description: string;
+  coverImage?: string;
+  recipeIds: string[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface LocalProfile {
+  id: string;
+  name: string;
+  username: string;
+  bio: string;
+  avatar: string;
+  favoriteCuisines: string[];
+  diet: string;
+  cookingLevel: 'Beginner' | 'Intermediate' | 'Advanced' | 'Master Home Chef';
+  following: string[]; // creator IDs
+  savedRecipes: string[]; // recipe IDs
+  collections: Collection[];
+  createdAt: string;
+}
+
+export interface ActivityItem {
+  id: string;
+  type: 
+    | 'saved_recipe' 
+    | 'created_recipe' 
+    | 'updated_recipe' 
+    | 'deleted_recipe' 
+    | 'rated_recipe' 
+    | 'commented' 
+    | 'followed_creator' 
+    | 'unfollowed_creator' 
+    | 'generated_ai' 
+    | 'created_collection' 
+    | 'completed_cooking'
+    | 'cooked_recipe'
+    | 'grocery_updated'
+    | 'meal_planned';
+  title: string;
+  description: string;
+  timestamp: string;
+  recipeId?: string;
+  recipeTitle?: string;
+  creatorName?: string;
+  rating?: number;
+}
+
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  favoriteCuisines: string[];
+  dietaryPreferences: string[];
+  cookingLevel: string;
+  defaultServings: number;
+  autoSaveHistory: boolean;
 }
 
 export interface PantryItem {
@@ -93,6 +192,10 @@ export type ActiveTab =
   | 'planner' 
   | 'groceries' 
   | 'saved' 
+  | 'collections'
   | 'create-recipe' 
   | 'my-recipes' 
-  | 'following';
+  | 'following'
+  | 'profile'
+  | 'activity'
+  | 'settings';

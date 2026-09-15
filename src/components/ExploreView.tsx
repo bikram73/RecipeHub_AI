@@ -10,9 +10,13 @@ import {
   ArrowRight, 
   Filter, 
   Utensils, 
-  Award,
-  Play
+  Play,
+  Share2,
+  Check,
+  Search,
+  RotateCcw
 } from 'lucide-react';
+import { shareRecipe } from '../services/share';
 
 interface ExploreViewProps {
   recipes: Recipe[];
@@ -23,6 +27,40 @@ interface ExploreViewProps {
   searchQuery: string;
 }
 
+const CUISINE_OPTIONS = [
+  'All',
+  'Indian',
+  'Italian',
+  'French-Nordic',
+  'Mexican',
+  'Japanese',
+  'Mediterranean',
+  'American',
+  'Chinese',
+  'Thai',
+];
+
+const CATEGORY_OPTIONS = [
+  { id: 'all', label: 'All Categories' },
+  { id: 'breakfast', label: 'Breakfast' },
+  { id: 'lunch', label: 'Lunch' },
+  { id: 'dinner', label: 'Dinner' },
+  { id: 'dessert', label: 'Dessert' },
+  { id: 'snack', label: 'Snacks & Bites' },
+  { id: 'baking', label: 'Artisan Baking' },
+];
+
+const DIETARY_OPTIONS = [
+  'All',
+  'High-Protein',
+  'Vegetarian',
+  'Gluten-Free',
+  'Vegan',
+  'Keto',
+  'Dairy-Free',
+  'Low-Carb',
+];
+
 export const ExploreView: React.FC<ExploreViewProps> = ({
   recipes,
   onSelectRecipe,
@@ -31,355 +69,421 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   onNavigateToGenerator,
   searchQuery,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedDietary, setSelectedDietary] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'rating' | 'time' | 'calories'>('rating');
+  const [selectedCuisine, setSelectedCuisine] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedDietary, setSelectedDietary] = useState('All');
+  const [maxTime, setMaxTime] = useState<number>(120);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('All');
+  const [sortBy, setSortBy] = useState<'rating' | 'time' | 'calories' | 'reviews'>('rating');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const categories = [
-    { id: 'all', label: 'All Dishes', icon: '🍽️' },
-    { id: 'dinner', label: 'Dinner', icon: '🍝' },
-    { id: 'breakfast', label: 'Breakfast', icon: '🥑' },
-    { id: 'lunch', label: 'Lunch', icon: '🌮' },
-    { id: 'dessert', label: 'Dessert', icon: '🍰' },
-  ];
+  const handleShare = async (e: React.MouseEvent, recipe: Recipe) => {
+    e.stopPropagation();
+    const res = await shareRecipe(recipe);
+    if (res.copied) {
+      setCopiedId(recipe.id);
+      setTimeout(() => setCopiedId(null), 2500);
+    }
+  };
 
-  const dietaryOptions = [
-    'all',
-    'High-Protein',
-    'Keto',
-    'Vegetarian',
-    'Gluten-Free',
-    'Vegan',
-  ];
+  const handleResetFilters = () => {
+    setSelectedCuisine('All');
+    setSelectedCategory('all');
+    setSelectedDietary('All');
+    setMaxTime(120);
+    setSelectedDifficulty('All');
+    setSortBy('rating');
+  };
 
   const filteredRecipes = useMemo(() => {
-    return recipes.filter((recipe) => {
-      // Search query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesTitle = recipe.title.toLowerCase().includes(q);
-        const matchesCuisine = recipe.cuisine.toLowerCase().includes(q);
-        const matchesTags = recipe.tags.some(t => t.toLowerCase().includes(q));
-        const matchesIngredients = recipe.ingredients.some(i => i.name.toLowerCase().includes(q));
-        if (!matchesTitle && !matchesCuisine && !matchesTags && !matchesIngredients) {
+    return recipes
+      .filter((recipe) => {
+        // Search query
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          const matchesTitle = recipe.title.toLowerCase().includes(q);
+          const matchesCuisine = recipe.cuisine.toLowerCase().includes(q);
+          const matchesTags = recipe.tags?.some((t) => t.toLowerCase().includes(q));
+          const matchesIngredients = recipe.ingredients?.some((i) =>
+            i.name.toLowerCase().includes(q)
+          );
+          if (!matchesTitle && !matchesCuisine && !matchesTags && !matchesIngredients) {
+            return false;
+          }
+        }
+
+        // Cuisine filter
+        if (selectedCuisine !== 'All' && recipe.cuisine !== selectedCuisine) {
           return false;
         }
-      }
 
-      // Category filter
-      if (selectedCategory !== 'all' && recipe.category !== selectedCategory) {
-        return false;
-      }
-
-      // Dietary filter
-      if (selectedDietary !== 'all') {
-        if (!recipe.dietary.includes(selectedDietary as any)) {
+        // Category filter
+        if (selectedCategory !== 'all' && recipe.category !== selectedCategory) {
           return false;
         }
-      }
 
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === 'rating') return b.rating - a.rating;
-      if (sortBy === 'time') return (a.prepTimeMinutes + a.cookTimeMinutes) - (b.prepTimeMinutes + b.cookTimeMinutes);
-      if (sortBy === 'calories') return a.nutrition.calories - b.nutrition.calories;
-      return 0;
-    });
-  }, [recipes, searchQuery, selectedCategory, selectedDietary, sortBy]);
+        // Dietary filter
+        if (selectedDietary !== 'All') {
+          if (!recipe.dietary?.includes(selectedDietary as any)) {
+            return false;
+          }
+        }
+
+        // Difficulty
+        if (selectedDifficulty !== 'All' && recipe.difficulty !== selectedDifficulty) {
+          return false;
+        }
+
+        // Max time
+        const totalTime = (recipe.prepTimeMinutes || 0) + (recipe.cookTimeMinutes || 0);
+        if (totalTime > maxTime) {
+          return false;
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+        if (sortBy === 'time')
+          return (
+            (a.prepTimeMinutes + a.cookTimeMinutes) -
+            (b.prepTimeMinutes + b.cookTimeMinutes)
+          );
+        if (sortBy === 'calories')
+          return (a.nutrition?.calories || 0) - (b.nutrition?.calories || 0);
+        if (sortBy === 'reviews')
+          return (b.reviewCount || 0) - (a.reviewCount || 0);
+        return 0;
+      });
+  }, [
+    recipes,
+    searchQuery,
+    selectedCuisine,
+    selectedCategory,
+    selectedDietary,
+    selectedDifficulty,
+    maxTime,
+    sortBy,
+  ]);
 
   const featuredRecipe = useMemo(() => {
-    return recipes.find(r => r.featured) || recipes[0];
+    return recipes.find((r) => r.featured) || recipes[0];
   }, [recipes]);
 
+  const hasActiveFilter =
+    selectedCuisine !== 'All' ||
+    selectedCategory !== 'all' ||
+    selectedDietary !== 'All' ||
+    selectedDifficulty !== 'All' ||
+    maxTime < 120;
+
   return (
-    <div className="space-y-8 pb-16">
-      {/* Hero Banner with Featured Recipe */}
-      {!searchQuery && selectedCategory === 'all' && selectedDietary === 'all' && featuredRecipe && (
-        <section className="relative overflow-hidden rounded-3xl bg-stone-900 text-white shadow-xl">
+    <div className="space-y-8 pb-16 animate-in fade-in duration-200">
+      {/* Featured Recipe Hero Banner */}
+      {!searchQuery && !hasActiveFilter && featuredRecipe && (
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#201a17] to-[#3e2820] text-white shadow-xl">
           <div className="absolute inset-0 z-0 opacity-40">
             <img
               src={featuredRecipe.imageUrl}
               alt={featuredRecipe.title}
-              className="w-full h-full object-cover object-center scale-105 transition-transform duration-1000"
+              className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
           </div>
 
-          <div className="relative z-10 p-6 sm:p-10 md:p-12 max-w-2xl">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold uppercase tracking-wider backdrop-blur-xs">
-                <Award className="w-3.5 h-3.5" /> Featured Masterclass
-              </span>
-              <span className="text-xs text-stone-300 font-medium">
-                {featuredRecipe.cuisine} • {featuredRecipe.difficulty}
-              </span>
+          <div className="relative z-10 p-6 sm:p-10 md:max-w-2xl space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ffdbcd]/20 backdrop-blur-md border border-[#ffdbcd]/30 text-xs font-bold text-[#ffdbcd]">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Chef's Featured Masterpiece</span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-3 leading-tight">
+            <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight">
               {featuredRecipe.title}
             </h1>
 
-            <p className="text-sm sm:text-base text-stone-300 line-clamp-2 mb-6 font-normal leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-200 leading-relaxed line-clamp-3">
               {featuredRecipe.description}
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-stone-300 mb-6">
-              <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-xs">
-                <Clock className="w-4 h-4 text-amber-400" />
-                <span>{featuredRecipe.prepTimeMinutes + featuredRecipe.cookTimeMinutes} mins</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-xs">
-                <Flame className="w-4 h-4 text-rose-400" />
+            <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-gray-300 pt-2">
+              <span className="flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-[#ffdbcd]" />
+                <span>{featuredRecipe.prepTimeMinutes + featuredRecipe.cookTimeMinutes} Mins</span>
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1.5">
+                <Flame className="w-4 h-4 text-[#ffdbcd]" />
                 <span>{featuredRecipe.nutrition.calories} kcal</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-xs">
-                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <span className="font-semibold text-white">{featuredRecipe.rating}</span>
-                <span className="text-stone-400">({featuredRecipe.reviewCount})</span>
-              </div>
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1.5 text-amber-400 font-bold">
+                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                <span>{featuredRecipe.rating} ({featuredRecipe.reviewCount} reviews)</span>
+              </span>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3 pt-4">
               <button
-                id="hero-cook-btn"
-                onClick={(e) => onStartCooking(featuredRecipe, e)}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-sm transition-all shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-[0.98]"
+                onClick={() => onSelectRecipe(featuredRecipe)}
+                className="px-6 py-3 rounded-xl bg-[#9f3d00] hover:bg-[#c74e00] text-white font-bold text-xs flex items-center gap-2 shadow-lg transition-all cursor-pointer"
               >
-                <Play className="w-4 h-4 fill-stone-950" />
-                Start Guided Cooking
+                <span>View Full Recipe</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
               <button
-                id="hero-view-details-btn"
-                onClick={() => onSelectRecipe(featuredRecipe)}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium text-sm transition-all backdrop-blur-xs"
+                onClick={(e) => onStartCooking(featuredRecipe, e)}
+                className="px-5 py-3 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-xs flex items-center gap-2 transition-all cursor-pointer"
               >
-                View Recipe & Ingredients
+                <Play className="w-4 h-4 fill-white" />
+                <span>Cook Mode</span>
               </button>
             </div>
           </div>
         </section>
       )}
 
-      {/* AI Kitchen Quick Trigger Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-orange-500/10 border border-amber-200/70 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center text-white shadow-md shadow-amber-500/30 flex-shrink-0">
-            <Sparkles className="w-6 h-6 animate-pulse" />
-          </div>
-          <div>
-            <h3 className="font-bold text-stone-900 text-base">Have random ingredients in your fridge?</h3>
-            <p className="text-xs sm:text-sm text-stone-600">Chef AI can invent a custom restaurant-grade recipe in 5 seconds.</p>
-          </div>
-        </div>
-        <button
-          id="trigger-ai-generator-btn"
-          onClick={onNavigateToGenerator}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shadow-sm hover:translate-x-0.5"
-        >
-          <span>Open AI Kitchen</span>
-          <ArrowRight className="w-4 h-4 text-amber-400" />
-        </button>
-      </div>
-
-      {/* Category Pills & Filters */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          {/* Main Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full">
-            {categories.map((cat) => (
+      {/* Filter Matrix Controls */}
+      <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-xs space-y-4">
+        {/* Category Pills */}
+        <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1">
+          <div className="flex items-center gap-1.5">
+            {CATEGORY_OPTIONS.map((cat) => (
               <button
                 key={cat.id}
-                id={`category-tab-${cat.id}`}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                   selectedCategory === cat.id
-                    ? 'bg-stone-900 text-white shadow-sm'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200/80 hover:text-stone-900'
+                    ? 'bg-[#9f3d00] text-white shadow-xs'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <span>{cat.icon}</span>
-                <span>{cat.label}</span>
+                {cat.label}
               </button>
             ))}
           </div>
 
-          {/* Sort Selector */}
-          <div className="flex items-center gap-2 text-xs text-stone-500 ml-auto">
-            <Filter className="w-3.5 h-3.5 text-stone-400" />
-            <span className="hidden sm:inline">Sort:</span>
+          {hasActiveFilter && (
+            <button
+              onClick={handleResetFilters}
+              className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 shrink-0 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset Filters
+            </button>
+          )}
+        </div>
+
+        {/* Dropdown Filters Row */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 pt-1 border-t border-gray-100">
+          <div>
+            <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Cuisine</label>
             <select
-              id="recipe-sort-select"
+              value={selectedCuisine}
+              onChange={(e) => setSelectedCuisine(e.target.value)}
+              className="w-full px-2.5 py-2 text-xs rounded-xl border border-gray-200 bg-white"
+            >
+              {CUISINE_OPTIONS.map((c) => (
+                <option key={c} value={c}>{c === 'All' ? 'All Cuisines' : c}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Dietary Target</label>
+            <select
+              value={selectedDietary}
+              onChange={(e) => setSelectedDietary(e.target.value)}
+              className="w-full px-2.5 py-2 text-xs rounded-xl border border-gray-200 bg-white"
+            >
+              {DIETARY_OPTIONS.map((d) => (
+                <option key={d} value={d}>{d === 'All' ? 'All Diets' : d}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Difficulty</label>
+            <select
+              value={selectedDifficulty}
+              onChange={(e) => setSelectedDifficulty(e.target.value)}
+              className="w-full px-2.5 py-2 text-xs rounded-xl border border-gray-200 bg-white"
+            >
+              <option value="All">Any Difficulty</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard / Master</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Sort By</label>
+            <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-stone-100 hover:bg-stone-200/70 border-none rounded-lg px-2.5 py-1.5 text-stone-700 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer"
+              className="w-full px-2.5 py-2 text-xs rounded-xl border border-gray-200 bg-white font-semibold text-[#9f3d00]"
             >
               <option value="rating">Highest Rated</option>
-              <option value="time">Quickest Cook Time</option>
+              <option value="reviews">Most Reviewed</option>
+              <option value="time">Quickest Time</option>
               <option value="calories">Lowest Calories</option>
             </select>
           </div>
+
+          <div className="col-span-2 sm:col-span-4 lg:col-span-1">
+            <div className="flex justify-between text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+              <span>Max Time</span>
+              <span className="text-[#9f3d00]">{maxTime >= 120 ? 'Any' : `${maxTime}m`}</span>
+            </div>
+            <input
+              type="range"
+              min={15}
+              max={120}
+              step={15}
+              value={maxTime}
+              onChange={(e) => setMaxTime(Number(e.target.value))}
+              className="w-full accent-[#9f3d00]"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Results Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-serif text-2xl font-bold text-gray-900">
+            {searchQuery ? `Search Results for "${searchQuery}"` : 'Culinary Catalog'}
+          </h2>
+          <p className="text-xs text-gray-500">Showing {filteredRecipes.length} recipes matching your criteria</p>
         </div>
 
-        {/* Dietary Filter Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-          <span className="text-stone-400 font-medium mr-1 flex items-center gap-1">
-            <Utensils className="w-3 h-3" /> Diet:
-          </span>
-          {dietaryOptions.map((diet) => (
-            <button
-              key={diet}
-              id={`dietary-filter-${diet}`}
-              onClick={() => setSelectedDietary(diet)}
-              className={`px-3 py-1 rounded-lg font-medium transition-all whitespace-nowrap ${
-                selectedDietary === diet
-                  ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                  : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-300'
-              }`}
+        <button
+          onClick={onNavigateToGenerator}
+          className="px-4 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-purple-200"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+          <span>Need custom? AI Generator</span>
+        </button>
+      </div>
+
+      {/* Recipe Grid */}
+      {filteredRecipes.length === 0 ? (
+        <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-gray-200 space-y-3">
+          <ChefHat className="w-12 h-12 text-gray-400 mx-auto" />
+          <h3 className="text-lg font-bold text-gray-800">No matching recipes found</h3>
+          <p className="text-xs text-gray-500 max-w-sm mx-auto">
+            Try resetting your filters or use our AI kitchen to create a custom recipe with your ingredients!
+          </p>
+          <button
+            onClick={handleResetFilters}
+            className="px-5 py-2.5 bg-[#9f3d00] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+          >
+            Reset All Filters
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredRecipes.map((recipe) => (
+            <div
+              key={recipe.id}
+              onClick={() => onSelectRecipe(recipe)}
+              className="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col cursor-pointer hover:-translate-y-1"
             >
-              {diet === 'all' ? 'All Diets' : diet}
-            </button>
+              {/* Image & Quick Action Badges */}
+              <div className="relative aspect-4/3 overflow-hidden bg-gray-100">
+                <img
+                  src={recipe.imageUrl}
+                  alt={recipe.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+
+                {/* Top Badges */}
+                <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1">
+                  {recipe.isAiGenerated && (
+                    <span className="px-2 py-0.5 rounded-full bg-purple-600/90 text-white text-[10px] font-bold backdrop-blur-xs flex items-center gap-1 shadow-xs">
+                      <Sparkles className="w-3 h-3" /> AI
+                    </span>
+                  )}
+                  <span className="px-2 py-0.5 rounded-full bg-black/60 text-white text-[10px] font-bold backdrop-blur-xs">
+                    {recipe.cuisine}
+                  </span>
+                </div>
+
+                {/* Right Top Action Bar */}
+                <div className="absolute top-2.5 right-2.5 flex items-center gap-1">
+                  <button
+                    type="button"
+                    title="Share Recipe"
+                    onClick={(e) => handleShare(e, recipe)}
+                    className="p-1.5 rounded-full bg-white/90 hover:bg-white text-gray-700 hover:text-[#9f3d00] shadow-sm transition-transform cursor-pointer"
+                  >
+                    {copiedId === recipe.id ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    ) : (
+                      <Share2 className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    title="Bookmark Recipe"
+                    onClick={(e) => onToggleSave(recipe.id, e)}
+                    className={`p-1.5 rounded-full bg-white/90 hover:bg-white shadow-sm transition-transform cursor-pointer ${
+                      recipe.isSaved ? 'text-rose-600' : 'text-gray-700 hover:text-rose-600'
+                    }`}
+                  >
+                    <Bookmark className={`w-3.5 h-3.5 ${recipe.isSaved ? 'fill-rose-600' : ''}`} />
+                  </button>
+                </div>
+
+                {/* Quick Cook Button */}
+                <button
+                  type="button"
+                  onClick={(e) => onStartCooking(recipe, e)}
+                  className="absolute bottom-2.5 right-2.5 px-3 py-1.5 rounded-xl bg-[#9f3d00] hover:bg-[#c74e00] text-white text-[11px] font-bold shadow-md flex items-center gap-1.5 backdrop-blur-xs transition-transform active:scale-95 cursor-pointer"
+                >
+                  <Play className="w-3 h-3 fill-white" />
+                  <span>Cook</span>
+                </button>
+              </div>
+
+              {/* Recipe Info */}
+              <div className="p-4 flex flex-col flex-1 justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <img
+                      src={recipe.author?.avatar}
+                      alt={recipe.author?.name}
+                      className="w-5 h-5 rounded-full object-cover"
+                    />
+                    <span className="text-[11px] font-medium text-gray-500">{recipe.author?.name}</span>
+                  </div>
+
+                  <h3 className="font-serif font-bold text-base text-gray-900 group-hover:text-[#9f3d00] transition-colors line-clamp-1">
+                    {recipe.title}
+                  </h3>
+                  <p className="text-xs text-gray-500 line-clamp-2 mt-1">
+                    {recipe.description}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-[#9f3d00]" />
+                    <span>{recipe.prepTimeMinutes + recipe.cookTimeMinutes}m</span>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Flame className="w-3.5 h-3.5 text-amber-600" />
+                    <span>{recipe.nutrition?.calories || 400} kcal</span>
+                  </span>
+                  <span className="flex items-center gap-1 text-amber-600 font-bold">
+                    <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                    <span>{recipe.rating}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
-      </div>
-
-      {/* Recipe Cards Grid */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-stone-900">
-            {searchQuery ? `Search Results for "${searchQuery}"` : 'Curated Recipes'}
-          </h2>
-          <span className="text-xs text-stone-500 font-medium">
-            {filteredRecipes.length} {filteredRecipes.length === 1 ? 'recipe' : 'recipes'} available
-          </span>
-        </div>
-
-        {filteredRecipes.length === 0 ? (
-          <div className="text-center py-16 px-4 bg-stone-50 rounded-2xl border border-stone-200">
-            <ChefHat className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-            <h3 className="font-semibold text-stone-800 text-base mb-1">No recipes found</h3>
-            <p className="text-xs text-stone-500 max-w-sm mx-auto mb-4">
-              We couldn't find matching recipes with your selected filters. Try searching different keywords or ask AI Kitchen to generate one.
-            </p>
-            <button
-              id="generate-recipe-empty-btn"
-              onClick={onNavigateToGenerator}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-stone-950 font-semibold text-xs shadow-sm hover:bg-amber-400 transition-all"
-            >
-              <Sparkles className="w-3.5 h-3.5" /> Generate This With AI
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredRecipes.map((recipe) => {
-              const totalTime = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
-              return (
-                <div
-                  key={recipe.id}
-                  id={`recipe-card-${recipe.id}`}
-                  onClick={() => onSelectRecipe(recipe)}
-                  className="group bg-white rounded-2xl border border-stone-200/80 overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col cursor-pointer hover:-translate-y-1"
-                >
-                  {/* Image Container */}
-                  <div className="relative aspect-4/3 overflow-hidden bg-stone-100">
-                    <img
-                      src={recipe.imageUrl}
-                      alt={recipe.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    
-                    {/* Gradient overlay on image */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-
-                    {/* Top Badges */}
-                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-stone-900/80 text-white backdrop-blur-xs">
-                        {recipe.cuisine}
-                      </span>
-                      <button
-                        id={`bookmark-btn-${recipe.id}`}
-                        onClick={(e) => onToggleSave(recipe.id, e)}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all backdrop-blur-xs ${
-                          recipe.isSaved
-                            ? 'bg-rose-500 text-white shadow-sm'
-                            : 'bg-stone-900/60 text-white hover:bg-stone-900/90'
-                        }`}
-                        title={recipe.isSaved ? 'Remove from saved' : 'Save recipe'}
-                      >
-                        <Bookmark className={`w-4 h-4 ${recipe.isSaved ? 'fill-white' : ''}`} />
-                      </button>
-                    </div>
-
-                    {/* AI Generation badge if applicable */}
-                    {recipe.isAiGenerated && (
-                      <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500 text-stone-950 shadow-xs">
-                        <Sparkles className="w-3 h-3" /> Chef AI
-                      </div>
-                    )}
-
-                    {/* Time pill bottom right */}
-                    <div className="absolute bottom-3 right-3 flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-md bg-black/60 text-white backdrop-blur-xs">
-                      <Clock className="w-3 h-3 text-amber-400" />
-                      <span>{totalTime}m</span>
-                    </div>
-                  </div>
-
-                  {/* Content Container */}
-                  <div className="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      {/* Dietary tags */}
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {recipe.dietary.slice(0, 2).map((d) => (
-                          <span
-                            key={d}
-                            className="text-[10px] font-semibold px-2 py-0.5 rounded-sm bg-stone-100 text-stone-600"
-                          >
-                            {d}
-                          </span>
-                        ))}
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-sm bg-stone-100 text-stone-600">
-                          {recipe.difficulty}
-                        </span>
-                      </div>
-
-                      <h3 className="font-bold text-stone-900 text-base group-hover:text-amber-600 transition-colors line-clamp-1 mb-1">
-                        {recipe.title}
-                      </h3>
-                      <p className="text-xs text-stone-500 line-clamp-2 mb-3">
-                        {recipe.subtitle || recipe.description}
-                      </p>
-                    </div>
-
-                    {/* Bottom stats & action */}
-                    <div className="pt-3 border-t border-stone-100 flex items-center justify-between mt-auto">
-                      <div className="flex items-center gap-3 text-xs">
-                        <div className="flex items-center gap-1 font-semibold text-stone-800">
-                          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                          <span>{recipe.rating}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-stone-500">
-                          <Flame className="w-3.5 h-3.5 text-rose-500" />
-                          <span>{recipe.nutrition.calories} kcal</span>
-                        </div>
-                      </div>
-
-                      <button
-                        id={`quick-cook-btn-${recipe.id}`}
-                        onClick={(e) => onStartCooking(recipe, e)}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 font-semibold text-xs transition-colors"
-                        title="Start cooking mode"
-                      >
-                        <Play className="w-3 h-3 fill-amber-800 text-amber-800" />
-                        <span>Cook</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };
