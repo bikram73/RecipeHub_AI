@@ -6,7 +6,8 @@ import {
   GroceryItem, 
   ActiveTab, 
   Ingredient,
-  Creator
+  Creator,
+  LocalProfile
 } from './types';
 import { INITIAL_RECIPES, INITIAL_PANTRY_ITEMS } from './data/mockRecipes';
 import { Header } from './components/Header';
@@ -29,12 +30,19 @@ import { AddToCollectionModal } from './components/AddToCollectionModal';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
 import { CreatorProfileModal } from './components/CreatorProfileModal';
 import { OnboardingModal } from './components/OnboardingModal';
-import { getStoredRecipes, saveStoredRecipes, logActivity } from './utils/storage';
+import { getStoredRecipes, saveStoredRecipes, logActivity, getProfile, isOnboarded } from './utils/storage';
 
 export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Profile & First-Time Onboarding State
+  const [profile, setProfile] = useState<LocalProfile>(() => getProfile());
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return !isOnboarded();
+  });
 
   // Modals
   const [isCreateEditModalOpen, setIsCreateEditModalOpen] = useState<boolean>(false);
@@ -329,7 +337,13 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#faf6f3] text-[#201a17] font-sans flex flex-col selection:bg-[#ffdbcd] selection:text-[#9f3d00]">
       {/* First-time Onboarding Modal */}
-      <OnboardingModal />
+      <OnboardingModal
+        isOpen={isOnboardingOpen}
+        onComplete={(newProfile) => {
+          setProfile(newProfile);
+          setIsOnboardingOpen(false);
+        }}
+      />
 
       {/* Top Header */}
       <Header
@@ -487,7 +501,9 @@ export default function App() {
         {activeTab === 'profile' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <ProfileView
+              profile={profile}
               recipes={recipes}
+              onUpdateProfile={(updated) => setProfile(updated)}
               onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
               onStartCooking={handleStartCooking}
               onNavigateToTab={(tab) => setActiveTab(tab)}
@@ -513,9 +529,17 @@ export default function App() {
         {activeTab === 'settings' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <SettingsView
+              onNavigate={(tab) => setActiveTab(tab)}
+              onRefreshAppState={() => {
+                setRecipes(getStoredRecipes(INITIAL_RECIPES));
+                setProfile(getProfile());
+                setActiveTab('home');
+              }}
               onClearAllData={() => {
                 setRecipes(INITIAL_RECIPES);
                 setPantryItems(INITIAL_PANTRY_ITEMS);
+                setProfile(getProfile());
+                setIsOnboardingOpen(true);
                 setActiveTab('home');
               }}
             />

@@ -16,9 +16,9 @@ const STORAGE_KEYS = {
 // Default initial profile
 export const DEFAULT_PROFILE: LocalProfile = {
   id: 'user-local-1',
-  name: 'Bikram Manna',
-  username: 'bikram',
-  bio: 'Home Cook & Culinary Explorer. Passionate about authentic spices, quick weeknight dinners, and AI-powered flavor pairing.',
+  name: 'Home Chef',
+  username: 'chef',
+  bio: 'Home cook & culinary explorer. Passionate about authentic spices, quick weeknight dinners, and AI-powered flavor pairing.',
   avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80',
   favoriteCuisines: ['Indian', 'Italian', 'Mediterranean', 'French-Nordic'],
   diet: 'No Preference',
@@ -53,6 +53,16 @@ export const DEFAULT_PROFILE: LocalProfile = {
   ],
   createdAt: new Date().toISOString(),
 };
+
+export function isOnboarded(): boolean {
+  if (typeof window === 'undefined') return true;
+  return localStorage.getItem('recipehub_onboarded') === 'true';
+}
+
+export function setOnboarded(status: boolean): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('recipehub_onboarded', status ? 'true' : 'false');
+}
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'light',

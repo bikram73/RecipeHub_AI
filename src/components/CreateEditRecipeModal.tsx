@@ -213,8 +213,8 @@ export const CreateEditRecipeModal: React.FC<CreateEditRecipeModalProps> = ({
       author: currentRecipe
         ? currentRecipe.author
         : {
-            name: profile.name || 'Bikram Manna',
-            avatar: profile.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80',
+            name: profile?.name || 'Home Chef',
+            avatar: profile?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80',
             role: 'Home Sommelier',
           },
       isSaved: currentRecipe ? currentRecipe.isSaved : false,

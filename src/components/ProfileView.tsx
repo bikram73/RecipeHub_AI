@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChefHat, Bookmark, Heart, Users, Sparkles, Edit3, Save, Check, Star, Activity, Settings, Plus } from 'lucide-react';
 import { LocalProfile, Recipe } from '../types';
-import { saveProfile, logActivity } from '../utils/storage';
+import { saveProfile, getProfile, logActivity } from '../utils/storage';
 
 interface ProfileViewProps {
-  profile: LocalProfile;
+  profile?: LocalProfile;
   recipes: Recipe[];
-  onUpdateProfile: (updated: LocalProfile) => void;
-  onNavigate: (tab: any) => void;
+  onUpdateProfile?: (updated: LocalProfile) => void;
+  onNavigate?: (tab: any) => void;
+  onNavigateToTab?: (tab: any) => void;
   onSelectRecipe: (recipe: Recipe) => void;
+  onStartCooking?: (recipe: Recipe) => void;
   onOpenCreateRecipe: () => void;
 }
 
@@ -17,35 +19,51 @@ const DIETS = ['No Preference', 'Vegetarian', 'Vegan', 'Gluten-Free', 'High-Prot
 const LEVELS: ('Beginner' | 'Intermediate' | 'Advanced' | 'Master Home Chef')[] = ['Beginner', 'Intermediate', 'Advanced', 'Master Home Chef'];
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
-  profile,
+  profile: propProfile,
   recipes,
   onUpdateProfile,
   onNavigate,
+  onNavigateToTab,
   onSelectRecipe,
+  onStartCooking,
   onOpenCreateRecipe,
 }) => {
+  const currentProfile = propProfile || getProfile();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(profile.name);
-  const [username, setUsername] = useState(profile.username);
-  const [bio, setBio] = useState(profile.bio);
-  const [diet, setDiet] = useState(profile.diet);
-  const [cookingLevel, setCookingLevel] = useState(profile.cookingLevel);
-  const [favoriteCuisines, setFavoriteCuisines] = useState<string[]>(profile.favoriteCuisines || []);
+  const [name, setName] = useState(currentProfile?.name || 'Home Chef');
+  const [username, setUsername] = useState(currentProfile?.username || 'chef');
+  const [bio, setBio] = useState(currentProfile?.bio || '');
+  const [diet, setDiet] = useState(currentProfile?.diet || 'No Preference');
+  const [cookingLevel, setCookingLevel] = useState(currentProfile?.cookingLevel || 'Intermediate');
+  const [favoriteCuisines, setFavoriteCuisines] = useState<string[]>(currentProfile?.favoriteCuisines || []);
+
+  const navigateHandler = onNavigate || onNavigateToTab || (() => {});
+
+  useEffect(() => {
+    if (propProfile) {
+      setName(propProfile.name || 'Home Chef');
+      setUsername(propProfile.username || 'chef');
+      setBio(propProfile.bio || '');
+      setDiet(propProfile.diet || 'No Preference');
+      setCookingLevel(propProfile.cookingLevel || 'Intermediate');
+      setFavoriteCuisines(propProfile.favoriteCuisines || []);
+    }
+  }, [propProfile]);
 
   // Stats calculation
   const myCreatedRecipes = recipes.filter(
-    (r) => r.author?.name === profile.name || r.id.startsWith('user-rec-')
+    (r) => r.author?.name === currentProfile?.name || r.id.startsWith('user-rec-')
   );
-  const savedCount = profile.savedRecipes?.length || 0;
-  const collectionsCount = profile.collections?.length || 0;
-  const followingCount = profile.following?.length || 0;
+  const savedCount = currentProfile?.savedRecipes?.length || 0;
+  const collectionsCount = currentProfile?.collections?.length || 0;
+  const followingCount = currentProfile?.following?.length || 0;
   const aiGeneratedCount = recipes.filter((r) => r.isAiGenerated).length;
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     const updated: LocalProfile = {
-      ...profile,
-      name: name.trim() || 'Culinary Creator',
+      ...currentProfile,
+      name: name.trim() || 'Home Chef',
       username: username.trim().toLowerCase() || 'chef',
       bio: bio.trim(),
       diet,
@@ -54,7 +72,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     };
 
     saveProfile(updated);
-    onUpdateProfile(updated);
+    if (onUpdateProfile) {
+      onUpdateProfile(updated);
+    }
     setIsEditing(false);
     logActivity({
       type: 'created_recipe',
@@ -95,7 +115,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 -mt-16 mb-6">
             <div className="flex items-end gap-5">
               <div className="w-28 h-28 rounded-3xl overflow-hidden ring-4 ring-white shadow-xl bg-gradient-to-tr from-[#ffdbcd] to-[#ffdcc4] text-[#9f3d00] font-serif font-bold text-3xl flex items-center justify-center shrink-0">
-                {(profile?.name || 'Chef')
+                {(currentProfile?.name || 'Chef')
                   .split(' ')
                   .filter(Boolean)
                   .map((n) => n.charAt(0))
@@ -105,12 +125,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               </div>
               <div className="pt-2">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900">{profile.name}</h1>
+                  <h1 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900">{currentProfile.name}</h1>
                   <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
                     Active
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 font-medium">@{profile.username} • {profile.cookingLevel}</p>
+                <p className="text-sm text-gray-500 font-medium">@{currentProfile.username} • {currentProfile.cookingLevel}</p>
               </div>
             </div>
 
@@ -123,7 +143,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <span>Create Recipe</span>
               </button>
               <button
-                onClick={() => onNavigate('settings')}
+                onClick={() => navigateHandler('settings')}
                 className="p-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
                 title="Settings"
               >
@@ -135,11 +155,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           {/* Bio */}
           {!isEditing ? (
             <div className="p-4 rounded-2xl bg-[#fff8f5] border border-amber-100 text-sm text-gray-700 leading-relaxed mb-8">
-              <p>{profile.bio}</p>
+              <p>{currentProfile.bio || 'Home cook & culinary explorer.'}</p>
               <div className="mt-3 pt-3 border-t border-amber-200/60 flex flex-wrap items-center gap-4 text-xs font-medium text-gray-600">
-                <span>🍽️ Diet: <strong className="text-gray-900">{profile.diet}</strong></span>
-                <span>🔥 Level: <strong className="text-gray-900">{profile.cookingLevel}</strong></span>
-                <span>❤️ Favorite Cuisines: <strong className="text-gray-900">{profile.favoriteCuisines?.join(', ')}</strong></span>
+                <span>🍽️ Diet: <strong className="text-gray-900">{currentProfile.diet}</strong></span>
+                <span>🔥 Level: <strong className="text-gray-900">{currentProfile.cookingLevel}</strong></span>
+                <span>❤️ Favorite Cuisines: <strong className="text-gray-900">{currentProfile.favoriteCuisines?.join(', ')}</strong></span>
               </div>
             </div>
           ) : (
