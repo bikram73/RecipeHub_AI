@@ -43,7 +43,8 @@ export default function App() {
 
   const handleTabChange = (tab: ActiveTab) => {
     if (tab === 'my-recipes') {
-      if (!isOnboarded()) {
+      const isConfigured = isOnboarded() && profile.name && profile.name.trim() !== '' && profile.name !== 'Home Chef';
+      if (!isConfigured) {
         setIsOnboardingOpen(true);
       }
     }
@@ -366,6 +367,8 @@ export default function App() {
           setRecipeToEdit(null);
           setIsCreateEditModalOpen(true);
         }}
+        profile={profile}
+        onOpenOnboarding={() => setIsOnboardingOpen(true)}
       />
 
       {/* Main Content View Switcher */}
