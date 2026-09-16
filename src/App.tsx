@@ -526,12 +526,13 @@ export default function App() {
       {/* Unified Create & Edit Recipe Modal */}
       {isCreateEditModalOpen && (
         <CreateEditRecipeModal
-          initialRecipe={recipeToEdit}
+          isOpen={isCreateEditModalOpen}
+          recipeToEdit={recipeToEdit}
           onClose={() => {
             setIsCreateEditModalOpen(false);
             setRecipeToEdit(null);
           }}
-          onSaveRecipe={handleSaveRecipe}
+          onSave={handleSaveRecipe}
         />
       )}
 

@@ -4,10 +4,12 @@ import { Recipe, Ingredient, CookingStep, LocalProfile } from '../types';
 import { getProfile, logActivity } from '../utils/storage';
 
 interface CreateEditRecipeModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   recipeToEdit?: Recipe | null;
+  initialRecipe?: Recipe | null;
   onClose: () => void;
-  onSave: (recipe: Recipe) => void;
+  onSave?: (recipe: Recipe) => void;
+  onSaveRecipe?: (recipe: Recipe) => void;
 }
 
 const CUISINES = [
@@ -41,12 +43,16 @@ const PRESET_IMAGES = [
 ];
 
 export const CreateEditRecipeModal: React.FC<CreateEditRecipeModalProps> = ({
-  isOpen,
+  isOpen = true,
   recipeToEdit,
+  initialRecipe,
   onClose,
   onSave,
+  onSaveRecipe,
 }) => {
   const profile = getProfile();
+  const currentRecipe = recipeToEdit || initialRecipe || null;
+  const saveHandler = onSave || onSaveRecipe;
 
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
@@ -79,23 +85,23 @@ export const CreateEditRecipeModal: React.FC<CreateEditRecipeModalProps> = ({
 
   // Populate when editing
   useEffect(() => {
-    if (recipeToEdit) {
-      setTitle(recipeToEdit.title);
-      setSubtitle(recipeToEdit.subtitle || '');
-      setDescription(recipeToEdit.description || '');
-      setCuisine(recipeToEdit.cuisine || 'Indian');
-      setCategory((recipeToEdit.category as any) || 'dinner');
-      setDifficulty(recipeToEdit.difficulty || 'Medium');
-      setPrepTimeMinutes(recipeToEdit.prepTimeMinutes || 15);
-      setCookTimeMinutes(recipeToEdit.cookTimeMinutes || 25);
-      setServings(recipeToEdit.servings || 4);
-      setImageUrl(recipeToEdit.imageUrl || PRESET_IMAGES[0]);
-      setDietary(recipeToEdit.dietary || []);
-      setTagsInput((recipeToEdit.tags || []).join(', '));
-      setCalories(recipeToEdit.nutrition?.calories || 450);
-      setProtein(recipeToEdit.nutrition?.protein || 30);
-      setIngredients(recipeToEdit.ingredients || []);
-      setSteps(recipeToEdit.steps || []);
+    if (currentRecipe) {
+      setTitle(currentRecipe.title);
+      setSubtitle(currentRecipe.subtitle || '');
+      setDescription(currentRecipe.description || '');
+      setCuisine(currentRecipe.cuisine || 'Indian');
+      setCategory((currentRecipe.category as any) || 'dinner');
+      setDifficulty(currentRecipe.difficulty || 'Medium');
+      setPrepTimeMinutes(currentRecipe.prepTimeMinutes || 15);
+      setCookTimeMinutes(currentRecipe.cookTimeMinutes || 25);
+      setServings(currentRecipe.servings || 4);
+      setImageUrl(currentRecipe.imageUrl || PRESET_IMAGES[0]);
+      setDietary(currentRecipe.dietary || []);
+      setTagsInput((currentRecipe.tags || []).join(', '));
+      setCalories(currentRecipe.nutrition?.calories || 450);
+      setProtein(currentRecipe.nutrition?.protein || 30);
+      setIngredients(currentRecipe.ingredients || []);
+      setSteps(currentRecipe.steps || []);
     } else {
       // Reset defaults
       setTitle('');
@@ -103,7 +109,7 @@ export const CreateEditRecipeModal: React.FC<CreateEditRecipeModalProps> = ({
       setDescription('');
     }
     setValidationError(null);
-  }, [recipeToEdit, isOpen]);
+  }, [currentRecipe, isOpen]);
 
   if (!isOpen) return null;
 
@@ -173,7 +179,7 @@ export const CreateEditRecipeModal: React.FC<CreateEditRecipeModalProps> = ({
       .filter(Boolean);
 
     const recipePayload: Recipe = {
-      id: recipeToEdit ? recipeToEdit.id : `user-rec-${Date.now()}`,
+      id: currentRecipe ? currentRecipe.id : `user-rec-${Date.now()}`,
       title: title.trim(),
       subtitle: subtitle.trim() || `${cuisine} style home meal`,
       description: description.trim(),
@@ -184,8 +190,8 @@ export const CreateEditRecipeModal: React.FC<CreateEditRecipeModalProps> = ({
       prepTimeMinutes: Number(prepTimeMinutes) || 10,
       cookTimeMinutes: Number(cookTimeMinutes) || 20,
       servings: Number(servings) || 4,
-      rating: recipeToEdit ? recipeToEdit.rating : 5.0,
-      reviewCount: recipeToEdit ? recipeToEdit.reviewCount : 1,
+      rating: currentRecipe ? currentRecipe.rating : 5.0,
+      reviewCount: currentRecipe ? currentRecipe.reviewCount : 1,
       tags: tagsArray.length > 0 ? tagsArray : ['HomeMade', 'Fresh'],
       dietary: dietary as any,
       nutrition: {
@@ -204,22 +210,24 @@ export const CreateEditRecipeModal: React.FC<CreateEditRecipeModalProps> = ({
         ...st,
         stepNumber: i + 1,
       })),
-      author: recipeToEdit
-        ? recipeToEdit.author
+      author: currentRecipe
+        ? currentRecipe.author
         : {
             name: profile.name || 'Bikram Manna',
             avatar: profile.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80',
             role: 'Home Sommelier',
           },
-      isSaved: recipeToEdit ? recipeToEdit.isSaved : false,
+      isSaved: currentRecipe ? currentRecipe.isSaved : false,
       updatedAt: new Date().toISOString(),
-      createdAt: recipeToEdit?.createdAt || new Date().toISOString(),
+      createdAt: currentRecipe?.createdAt || new Date().toISOString(),
     };
 
-    onSave(recipePayload);
+    if (saveHandler) {
+      saveHandler(recipePayload);
+    }
     logActivity({
-      type: recipeToEdit ? 'updated_recipe' : 'created_recipe',
-      title: recipeToEdit ? 'Updated Recipe' : 'Created New Recipe',
+      type: currentRecipe ? 'updated_recipe' : 'created_recipe',
+      title: currentRecipe ? 'Updated Recipe' : 'Created New Recipe',
       description: `Saved "${recipePayload.title}" to local recipes.`,
       recipeId: recipePayload.id,
       recipeTitle: recipePayload.title,
