@@ -37,12 +37,18 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Profile & First-Time Onboarding State
+  // Profile & First-Time Onboarding State (triggered on clicking My Recipes if not onboarded)
   const [profile, setProfile] = useState<LocalProfile>(() => getProfile());
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return !isOnboarded();
-  });
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
+
+  const handleTabChange = (tab: ActiveTab) => {
+    if (tab === 'my-recipes') {
+      if (!isOnboarded()) {
+        setIsOnboardingOpen(true);
+      }
+    }
+    setActiveTab(tab);
+  };
 
   // Modals
   const [isCreateEditModalOpen, setIsCreateEditModalOpen] = useState<boolean>(false);
@@ -336,19 +342,22 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#faf6f3] text-[#201a17] font-sans flex flex-col selection:bg-[#ffdbcd] selection:text-[#9f3d00]">
-      {/* First-time Onboarding Modal */}
+      {/* First-time Onboarding & Profile Customization Modal */}
       <OnboardingModal
         isOpen={isOnboardingOpen}
+        initialProfile={profile}
+        onClose={() => setIsOnboardingOpen(false)}
         onComplete={(newProfile) => {
           setProfile(newProfile);
           setIsOnboardingOpen(false);
+          setActiveTab('my-recipes');
         }}
       />
 
       {/* Top Header */}
       <Header
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         savedCount={savedCount}
         myRecipesCount={myRecipesCount}
         searchQuery={searchQuery}
@@ -378,7 +387,7 @@ export default function App() {
                 setRecipeToEdit(null);
                 setIsCreateEditModalOpen(true);
               } else {
-                setActiveTab(tab);
+                handleTabChange(tab as ActiveTab);
               }
             }}
           />
@@ -469,9 +478,11 @@ export default function App() {
         {activeTab === 'my-recipes' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <MyRecipesView
+              profile={profile}
               recipes={recipes}
               onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
               onStartCooking={handleStartCooking}
+              onEditProfile={() => setIsOnboardingOpen(true)}
               onOpenCreateRecipe={() => {
                 setRecipeToEdit(null);
                 setIsCreateEditModalOpen(true);
@@ -622,7 +633,7 @@ export default function App() {
       {/* Mobile Bottom Navigation Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#e1bfb2]/40 px-2 py-2 flex items-center justify-around shadow-lg">
         <button
-          onClick={() => setActiveTab('home')}
+          onClick={() => handleTabChange('home')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
             activeTab === 'home' ? 'text-[#9f3d00]' : 'text-gray-500'
           }`}
@@ -632,7 +643,7 @@ export default function App() {
         </button>
 
         <button
-          onClick={() => setActiveTab('explore')}
+          onClick={() => handleTabChange('explore')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
             activeTab === 'explore' ? 'text-[#9f3d00]' : 'text-gray-500'
           }`}
@@ -642,7 +653,7 @@ export default function App() {
         </button>
 
         <button
-          onClick={() => setActiveTab('ai-kitchen')}
+          onClick={() => handleTabChange('ai-kitchen')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
             activeTab === 'ai-kitchen' || activeTab === 'generator'
               ? 'text-[#9f3d00]'
@@ -667,7 +678,7 @@ export default function App() {
         </button>
 
         <button
-          onClick={() => setActiveTab('saved')}
+          onClick={() => handleTabChange('saved')}
           className={`relative flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
             activeTab === 'saved' ? 'text-[#9f3d00]' : 'text-gray-500'
           }`}
@@ -682,7 +693,7 @@ export default function App() {
         </button>
 
         <button
-          onClick={() => setActiveTab('profile')}
+          onClick={() => handleTabChange('profile')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
             activeTab === 'profile' ? 'text-[#9f3d00]' : 'text-gray-500'
           }`}

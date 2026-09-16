@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { ChefHat, Sparkles, ArrowRight, Check, Utensils, User, AtSign, BookOpen } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChefHat, Sparkles, ArrowRight, Check, Utensils, User, AtSign, BookOpen, X } from 'lucide-react';
 import { LocalProfile } from '../types';
 import { saveProfile, setOnboarded, logActivity } from '../utils/storage';
 
 interface OnboardingModalProps {
   isOpen?: boolean;
+  initialProfile?: LocalProfile | null;
   onComplete: (profile: LocalProfile) => void;
+  onClose?: () => void;
 }
 
 const CUISINE_OPTIONS = [
@@ -46,17 +48,47 @@ const AVATAR_OPTIONS = [
   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
 ];
 
-export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen = true, onComplete }) => {
+export const OnboardingModal: React.FC<OnboardingModalProps> = ({
+  isOpen = true,
+  initialProfile,
+  onComplete,
+  onClose,
+}) => {
   const [step, setStep] = useState<1 | 2>(1);
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [isUsernameCustom, setIsUsernameCustom] = useState(false);
-  const [bio, setBio] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_OPTIONS[0]);
-  const [favoriteCuisines, setFavoriteCuisines] = useState<string[]>(['Indian', 'Italian']);
-  const [diet, setDiet] = useState('No Preference');
-  const [cookingLevel, setCookingLevel] = useState<'Beginner' | 'Intermediate' | 'Advanced' | 'Master Home Chef'>('Intermediate');
+  const [name, setName] = useState(initialProfile?.name && initialProfile.name !== 'Home Chef' ? initialProfile.name : '');
+  const [username, setUsername] = useState(initialProfile?.username && initialProfile.username !== 'chef' ? initialProfile.username : '');
+  const [isUsernameCustom, setIsUsernameCustom] = useState(Boolean(initialProfile?.username && initialProfile.username !== 'chef'));
+  const [bio, setBio] = useState(initialProfile?.bio || '');
+  const [selectedAvatar, setSelectedAvatar] = useState(initialProfile?.avatar || AVATAR_OPTIONS[0]);
+  const [favoriteCuisines, setFavoriteCuisines] = useState<string[]>(
+    initialProfile?.favoriteCuisines && initialProfile.favoriteCuisines.length > 0
+      ? initialProfile.favoriteCuisines
+      : ['Indian', 'Italian']
+  );
+  const [diet, setDiet] = useState(initialProfile?.diet || 'No Preference');
+  const [cookingLevel, setCookingLevel] = useState<'Beginner' | 'Intermediate' | 'Advanced' | 'Master Home Chef'>(
+    (initialProfile?.cookingLevel as any) || 'Intermediate'
+  );
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialProfile) {
+      if (initialProfile.name && initialProfile.name !== 'Home Chef') {
+        setName(initialProfile.name);
+      }
+      if (initialProfile.username && initialProfile.username !== 'chef') {
+        setUsername(initialProfile.username);
+        setIsUsernameCustom(true);
+      }
+      if (initialProfile.bio) setBio(initialProfile.bio);
+      if (initialProfile.avatar) setSelectedAvatar(initialProfile.avatar);
+      if (initialProfile.favoriteCuisines && initialProfile.favoriteCuisines.length > 0) {
+        setFavoriteCuisines(initialProfile.favoriteCuisines);
+      }
+      if (initialProfile.diet) setDiet(initialProfile.diet);
+      if (initialProfile.cookingLevel) setCookingLevel(initialProfile.cookingLevel as any);
+    }
+  }, [initialProfile, isOpen]);
 
   if (!isOpen) return null;
 
@@ -134,7 +166,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen = true,
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-amber-100 flex flex-col max-h-[92vh]">
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-[#9f3d00] to-[#c74e00] p-6 text-white relative">
+        <div className="bg-gradient-to-r from-[#9f3d00] to-[#c74e00] p-6 text-white relative flex items-center justify-between">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center text-white shadow-inner shrink-0">
               <ChefHat className="w-7 h-7" />
@@ -149,6 +181,17 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen = true,
               <p className="text-xs text-white/80 mt-0.5">Step {step} of 2 • Stored 100% locally in your browser</p>
             </div>
           </div>
+
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Form Body */}

@@ -5,23 +5,27 @@ import { getProfile } from '../utils/storage';
 import { shareRecipe } from '../services/share';
 
 interface MyRecipesViewProps {
+  profile?: LocalProfile;
   recipes: Recipe[];
   onSelectRecipe: (recipe: Recipe) => void;
   onStartCooking: (recipe: Recipe, e?: React.MouseEvent) => void;
   onOpenCreateRecipe: () => void;
+  onEditProfile?: () => void;
   onEditRecipe?: (recipe: Recipe) => void;
   onDeleteRecipe?: (recipeId: string, recipeTitle: string) => void;
 }
 
 export const MyRecipesView: React.FC<MyRecipesViewProps> = ({
+  profile: propProfile,
   recipes,
   onSelectRecipe,
   onStartCooking,
   onOpenCreateRecipe,
+  onEditProfile,
   onEditRecipe,
   onDeleteRecipe,
 }) => {
-  const profile: LocalProfile = getProfile();
+  const profile: LocalProfile = propProfile || getProfile();
   const [filterTab, setFilterTab] = useState<'all' | 'published' | 'ai' | 'favorites'>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -94,13 +98,25 @@ export const MyRecipesView: React.FC<MyRecipesViewProps> = ({
           </div>
         </div>
 
-        <button
-          onClick={onOpenCreateRecipe}
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#9f3d00] hover:bg-[#c74e00] text-white font-bold text-xs shadow-md transition-all shrink-0 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Create New Recipe</span>
-        </button>
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+          {onEditProfile && (
+            <button
+              onClick={onEditProfile}
+              className="inline-flex items-center gap-1.5 px-3.5 py-3 rounded-xl border border-[#e1bfb2] hover:bg-[#fff5f0] text-[#9f3d00] font-bold text-xs shadow-xs transition-all cursor-pointer"
+            >
+              <Edit3 className="w-4 h-4" />
+              <span>Edit Chef Details</span>
+            </button>
+          )}
+
+          <button
+            onClick={onOpenCreateRecipe}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#9f3d00] hover:bg-[#c74e00] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create New Recipe</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter Tabs Bar */}
