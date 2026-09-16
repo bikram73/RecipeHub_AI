@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ChefHat, Sparkles, Plus, Search, Bookmark, Users, Activity, Settings, Menu, X, Compass, Home } from 'lucide-react';
-import { ActiveTab, LocalProfile } from '../types';
-import { getProfile } from '../utils/storage';
+import { ActiveTab } from '../types';
 
 interface HeaderProps {
   activeTab: ActiveTab;
@@ -23,16 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
   setSearchQuery,
   onOpenCreateRecipe,
 }) => {
-  const profile: LocalProfile = getProfile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const initials = (profile?.name || 'Chef')
-    .split(' ')
-    .filter(Boolean)
-    .map((n) => n.charAt(0))
-    .join('')
-    .slice(0, 2)
-    .toUpperCase() || 'CH';
 
   const navLinks = [
     { id: 'home', label: 'Home', icon: Home },
@@ -147,20 +137,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Activity className="w-4 h-4" />
           </button>
 
-          {/* User Profile Avatar */}
-          <div className="flex items-center">
-            <button 
-              onClick={() => setActiveTab('profile')}
-              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-[#ffdbcd] to-[#ffdcc4] text-[#9f3d00] font-bold text-xs flex items-center justify-center shadow-xs transition-all cursor-pointer ${
-                activeTab === 'profile'
-                  ? 'ring-2 ring-[#9f3d00]'
-                  : 'ring-1 ring-amber-200 hover:ring-[#9f3d00]'
-              }`}
-              title={`${profile.name} - Profile & Kitchen`}
-            >
-              <span>{initials}</span>
-            </button>
-          </div>
+
 
           {/* Mobile Menu Toggle Button */}
           <button
