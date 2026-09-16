@@ -491,12 +491,14 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
   return (
     <div className="w-full flex flex-col antialiased text-[#201a17]">
       {/* Top Ambient Kitchen Glow Overlays */}
-      <div className="relative w-full overflow-hidden pb-10">
+      <div className="relative w-full overflow-hidden pb-16">
         <div className="absolute -top-24 -left-20 w-96 h-96 rounded-full bg-[#ffab69]/20 blur-3xl pointer-events-none" />
         <div className="absolute top-10 -right-20 w-[28rem] h-[28rem] rounded-full bg-[#ffdbcd]/35 blur-3xl pointer-events-none" />
 
-        {/* 1. HERO SECTION */}
-        <section className="relative pt-4 lg:pt-8">
+        {/* Content Container with Generous Side Margins and Alignment */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
+          {/* 1. HERO SECTION */}
+          <section className="relative pt-4 lg:pt-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* Left Hero Narrative */}
@@ -1250,6 +1252,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
           </div>
         </section>
 
+        </div>
       </div>
     </div>
   );
