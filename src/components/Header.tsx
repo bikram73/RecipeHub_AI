@@ -47,29 +47,29 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(41,35,31,0.04)] border-b border-[#e1bfb2]/30">
-      <div className="h-20 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
+      <div className="h-20 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex items-center justify-between gap-4 lg:gap-6">
         
-        {/* Left Side: Brand Logo */}
-        <div className="flex items-center gap-4 lg:gap-6 shrink-0">
+        {/* Left Side: Brand Logo & Desktop Navigation */}
+        <div className="flex items-center gap-6 xl:gap-8 shrink-0">
           <div 
             id="brand-logo"
             onClick={() => {
               setActiveTab('home');
               setMobileMenuOpen(false);
             }}
-            className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group shrink-0"
+            className="flex items-center gap-3 cursor-pointer group shrink-0 select-none"
           >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-[#9f3d00] to-[#c74e00] flex items-center justify-center text-white shadow-md shadow-[#9f3d00]/25 group-hover:scale-105 transition-all duration-200">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#9f3d00] to-[#c74e00] flex items-center justify-center text-white shadow-md shadow-[#9f3d00]/25 group-hover:scale-105 transition-all duration-200">
               <ChefHat className="w-5 h-5 text-white" />
             </div>
-            <span className="font-serif text-lg sm:text-2xl text-[#201a17] tracking-tight font-bold flex items-center gap-1">
+            <span className="font-serif text-xl sm:text-2xl text-[#201a17] tracking-tight font-bold flex items-center gap-1">
               <span>RecipeHub</span>
               <span className="text-[#9f3d00] italic font-serif">AI</span>
             </span>
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-1 text-xs font-medium">
+          <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold">
             {navLinks.map(({ id, label, icon: Icon, badge, count }) => {
               const isActive = activeTab === id || (id === 'ai-kitchen' && activeTab === 'generator');
               return (
@@ -77,17 +77,17 @@ export const Header: React.FC<HeaderProps> = ({
                   key={id}
                   id={`header-nav-${id}`}
                   onClick={() => setActiveTab(id as any)}
-                  className={`transition-all px-2.5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer text-xs ${
+                  className={`transition-all px-3 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                     isActive
                       ? 'text-[#9f3d00] font-bold bg-[#fef1ea] shadow-2xs'
                       : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-4 h-4" />
                   <span>{label}</span>
-                  {badge && <span className="text-[10px]">{badge}</span>}
+                  {badge && <span className="text-[11px] leading-none">{badge}</span>}
                   {count !== undefined && count > 0 && (
-                    <span className="ml-0.5 px-1.5 py-0.2 bg-[#9f3d00] text-white text-[10px] rounded-full font-bold">
+                    <span className="ml-0.5 px-1.5 py-0.5 bg-[#9f3d00] text-white text-[10px] rounded-full font-bold leading-none">
                       {count}
                     </span>
                   )}
@@ -97,22 +97,22 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
         </div>
 
-        {/* Right Side: Create Recipe, Search, Profile, Activity, Settings */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
+        {/* Right Side: Search, Create Action, Activity, Settings, Profile */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           
           {/* Header Search Input */}
           <div className="relative hidden md:flex items-center">
             <button
               onClick={handleSearchSubmit}
               title="Search"
-              className="absolute left-3 text-[#594137] hover:text-[#9f3d00] cursor-pointer"
+              className="absolute left-3 text-[#594137] hover:text-[#9f3d00] cursor-pointer flex items-center justify-center"
             >
               <Search className="w-4 h-4" />
             </button>
             <input
               id="header-search-input"
               type="text"
-              placeholder="Search dishes, ingredients, chefs..."
+              placeholder="Search recipes, tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => {
@@ -120,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({
                   handleSearchSubmit();
                 }
               }}
-              className="w-40 lg:w-56 bg-[#fef1ea] pl-9 pr-7 py-2 rounded-xl text-xs text-[#201a17] placeholder:text-[#8d7165] outline-none focus:bg-white focus:ring-2 focus:ring-[#9f3d00] transition-all font-medium border border-transparent focus:border-[#9f3d00]"
+              className="w-36 lg:w-48 xl:w-56 bg-[#fef1ea] pl-9 pr-7 py-2 rounded-xl text-xs text-[#201a17] placeholder:text-[#8d7165] outline-none focus:bg-white focus:ring-2 focus:ring-[#9f3d00] transition-all font-medium border border-transparent focus:border-[#9f3d00]"
             />
             {searchQuery && (
               <button
@@ -137,7 +137,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-create-recipe-btn"
               onClick={onOpenCreateRecipe}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#9f3d00] hover:bg-[#c74e00] text-white text-xs font-bold shadow-xs transition-all cursor-pointer shrink-0"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#9f3d00] hover:bg-[#c74e00] text-white text-xs font-bold shadow-xs transition-all cursor-pointer shrink-0"
             >
               <Plus className="w-4 h-4" />
               <span>Create</span>
@@ -149,10 +149,10 @@ export const Header: React.FC<HeaderProps> = ({
             id="header-activity-btn"
             onClick={() => setActiveTab('activity')}
             title="Activity Timeline"
-            className={`p-2 rounded-xl border transition-colors cursor-pointer hidden md:flex items-center justify-center ${
+            className={`w-9 h-9 rounded-xl border transition-colors cursor-pointer hidden md:flex items-center justify-center ${
               activeTab === 'activity'
                 ? 'bg-[#fef1ea] text-[#9f3d00] border-[#9f3d00]'
-                : 'border-transparent text-gray-600 hover:bg-gray-100'
+                : 'border-transparent text-gray-600 hover:bg-[#f8ece5]'
             }`}
           >
             <Activity className="w-4 h-4" />
@@ -163,10 +163,10 @@ export const Header: React.FC<HeaderProps> = ({
             id="header-settings-btn"
             onClick={() => setActiveTab('settings')}
             title="Settings"
-            className={`p-2 rounded-xl border transition-colors cursor-pointer hidden sm:flex items-center justify-center ${
+            className={`w-9 h-9 rounded-xl border transition-colors cursor-pointer hidden sm:flex items-center justify-center ${
               activeTab === 'settings'
                 ? 'bg-[#fef1ea] text-[#9f3d00] border-[#9f3d00]'
-                : 'border-transparent text-gray-600 hover:bg-gray-100'
+                : 'border-transparent text-gray-600 hover:bg-[#f8ece5]'
             }`}
           >
             <Settings className="w-4 h-4" />
@@ -178,18 +178,18 @@ export const Header: React.FC<HeaderProps> = ({
               id="header-profile-btn"
               onClick={() => setActiveTab('profile')}
               title={`Chef Profile: ${profile.name || 'Your Profile'}`}
-              className={`flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-xl border transition-all cursor-pointer ${
+              className={`flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-xl border transition-all cursor-pointer ${
                 activeTab === 'profile'
                   ? 'bg-[#fef1ea] border-[#9f3d00] text-[#9f3d00]'
-                  : 'bg-white/80 border-[#e1bfb2]/60 hover:border-[#9f3d00] text-[#201a17]'
+                  : 'bg-white border-[#e1bfb2]/60 hover:border-[#9f3d00] text-[#201a17]'
               }`}
             >
               <img
                 src={profile.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80'}
                 alt={profile.name || 'Profile'}
-                className="w-7 h-7 rounded-lg object-cover ring-1 ring-[#9f3d00]/30"
+                className="w-7 h-7 rounded-lg object-cover ring-1 ring-[#9f3d00]/30 shrink-0"
               />
-              <span className="text-xs font-bold truncate max-w-[80px] lg:max-w-[110px] hidden sm:inline">
+              <span className="text-xs font-bold truncate max-w-[80px] xl:max-w-[110px] hidden sm:inline">
                 {profile.name || 'Chef'}
               </span>
             </button>
@@ -199,7 +199,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="header-mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="xl:hidden p-2 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+            className="lg:hidden p-2 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
