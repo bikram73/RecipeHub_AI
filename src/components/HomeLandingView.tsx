@@ -12,6 +12,7 @@ interface HomeLandingViewProps {
   recipes: Recipe[];
   onSearch?: (query: string) => void;
   onOpenCreateRecipe?: () => void;
+  onOpenAskAi?: (prompt?: string) => void;
 }
 
 export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
@@ -23,6 +24,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
   recipes,
   onSearch,
   onOpenCreateRecipe,
+  onOpenAskAi,
 }) => {
   const [searchInput, setSearchInput] = useState('');
   const [isListening, setIsListening] = useState(false);
@@ -543,7 +545,10 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
 
                 <button
                   id="hero-ask-ai-btn"
-                  onClick={() => onNavigate('generator')}
+                  onClick={() => {
+                    if (onOpenAskAi) onOpenAskAi();
+                    else onNavigate('ai-kitchen');
+                  }}
                   className="inline-flex items-center gap-2 px-5 py-3 bg-white text-[#783d01] font-semibold text-base rounded-xl shadow-md hover:shadow-lg border border-[#e1bfb2]/40 transition-all duration-200 cursor-pointer hover:-translate-y-0.5"
                 >
                   <span className="material-symbols-outlined text-[#8e4e14] text-[20px]">psychology</span>
@@ -994,8 +999,12 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                       <button
                         key={promptText}
                         onClick={() => {
-                          onSearch(promptText);
-                          onNavigate('generator');
+                          if (onOpenAskAi) {
+                            onOpenAskAi(promptText);
+                          } else {
+                            if (onSearch) onSearch(promptText);
+                            onNavigate('ai-kitchen');
+                          }
                         }}
                         className="px-2.5 py-1 rounded-full bg-[#f8ece5] text-xs hover:bg-[#ffdbcd] hover:text-[#9f3d00] transition-colors text-[#201a17] font-medium cursor-pointer"
                       >
@@ -1008,7 +1017,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                 <div className="pt-2 flex flex-wrap items-center gap-3">
                   <button
                     id="open-ai-kitchen-btn"
-                    onClick={() => onNavigate('generator')}
+                    onClick={() => onNavigate('ai-kitchen')}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#9f3d00] font-bold text-base rounded-xl shadow-lg hover:shadow-2xl transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-[20px] text-[#9f3d00]">auto_awesome</span>

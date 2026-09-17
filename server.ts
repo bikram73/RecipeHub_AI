@@ -18,7 +18,14 @@ async function startServer() {
     const key = process.env.GEMINI_API_KEY;
     if (!key) return null;
     if (!aiClient) {
-      aiClient = new GoogleGenAI({ apiKey: key });
+      aiClient = new GoogleGenAI({
+        apiKey: key,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          },
+        },
+      });
     }
     return aiClient;
   }
@@ -83,7 +90,7 @@ Return ONLY pure, valid JSON (no markdown fences, no conversational text) matchi
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
@@ -115,13 +122,13 @@ Return ONLY pure, valid JSON (no markdown fences, no conversational text) matchi
         return res.json({ reply: null });
       }
 
-      let systemPrompt = `You are RecipeHub AI, an approachable and world-class culinary sommelier. Provide concise, clear, and actionable culinary guidance. Always offer exact cooking temperatures, ratios, or step-by-step pointers. Keep answers under 120 words unless requested.`;
+      let systemPrompt = `You are RecipeHub AI, an approachable, world-class culinary sommelier and chef. Provide concise, clear, and actionable culinary guidance. Always offer exact cooking temperatures, ratios, or step-by-step pointers. Keep answers under 150 words unless requested.`;
       if (recipeContext) {
         systemPrompt += `\nCurrent Recipe Context: "${recipeContext.title}" with ingredients: ${JSON.stringify(recipeContext.ingredients)}`;
       }
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: `${systemPrompt}\n\nUser Question: ${message}`,
       });
 
@@ -156,7 +163,7 @@ Return ONLY valid JSON matching:
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
@@ -200,7 +207,7 @@ Return ONLY valid JSON:
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',

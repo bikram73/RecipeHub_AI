@@ -5,23 +5,39 @@ import { generateRecipeWithAI, askCulinaryAssistant, getIngredientSubstitution, 
 import { logActivity } from '../utils/storage';
 
 interface AiKitchenViewProps {
-  recipes: Recipe[];
-  onSaveRecipe: (recipe: Recipe) => void;
-  onSelectRecipe: (recipe: Recipe) => void;
-  onStartCooking: (recipe: Recipe) => void;
+  recipes?: Recipe[];
+  pantryItems?: any[];
+  onRecipeGenerated?: (recipe: Recipe) => void;
+  onSaveRecipe?: (recipe: Recipe) => void;
+  onSelectRecipe?: (recipe: Recipe) => void;
+  onStartCooking?: (recipe: Recipe) => void;
+  onToggleSave?: (recipe: Recipe) => void;
+  initialSubTab?: 'generator' | 'assistant' | 'substitute' | 'improve';
+  initialQuery?: string;
 }
 
 export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
-  recipes,
+  recipes = [],
+  pantryItems = [],
+  onRecipeGenerated,
   onSaveRecipe,
   onSelectRecipe,
   onStartCooking,
+  onToggleSave,
+  initialSubTab = 'generator',
+  initialQuery = '',
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'generator' | 'assistant' | 'substitute' | 'improve'>('generator');
+  const [activeSubTab, setActiveSubTab] = useState<'generator' | 'assistant' | 'substitute' | 'improve'>(initialSubTab);
 
   // 1. Generator State
   const [ingredientsInput, setIngredientsInput] = useState('');
-  const [ingredientsList, setIngredientsList] = useState<string[]>(['Chicken breast', 'Cherry tomatoes', 'Fresh basil', 'Garlic']);
+  const [ingredientsList, setIngredientsList] = useState<string[]>(() => {
+    if (pantryItems && pantryItems.length > 0) {
+      const inStock = pantryItems.filter(p => p.inStock).map(p => p.name);
+      if (inStock.length > 0) return inStock.slice(0, 5);
+    }
+    return ['Chicken breast', 'Cherry tomatoes', 'Fresh basil', 'Garlic'];
+  });
   const [selectedCuisine, setSelectedCuisine] = useState('Any');
   const [selectedDiet, setSelectedDiet] = useState('Any');
   const [selectedMealType, setSelectedMealType] = useState('dinner');
@@ -30,11 +46,11 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
   const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null);
 
   // 2. Chat Assistant State
-  const [chatInput, setChatInput] = useState('');
+  const [chatInput, setChatInput] = useState(initialQuery || '');
   const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'ai'; text: string }[]>([
     {
       sender: 'ai',
-      text: 'Hello Chef! I am your AI Culinary Sommelier powered by Gemini. Ask me about flavor pairings, baking troubleshooting, cooking times, or recipe modifications!',
+      text: 'Hello Chef! I am your AI Culinary Sommelier powered by Gemini 3.8. Ask me about flavor pairings, ingredient substitutes, oven temperatures, nutrition tweaks, or cooking troubleshooting!',
     },
   ]);
   const [isChatLoading, setIsChatLoading] = useState(false);
@@ -45,7 +61,7 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
   const [isSubLoading, setIsSubLoading] = useState(false);
 
   // 4. Improve Recipe State
-  const [selectedRecipeForImprove, setSelectedRecipeForImprove] = useState<Recipe>(recipes[0] || null);
+  const [selectedRecipeForImprove, setSelectedRecipeForImprove] = useState<Recipe | null>(recipes[0] || null);
   const [improveGoal, setImproveGoal] = useState<'healthier' | 'vegan' | 'quicker' | 'high_protein'>('healthier');
   const [improveResult, setImproveResult] = useState<ImprovementResult | null>(null);
   const [isImproveLoading, setIsImproveLoading] = useState(false);
@@ -147,7 +163,7 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold uppercase tracking-wider mb-2">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Gemini 2.5 Flash Culinary Intelligence</span>
+              <span>Gemini 3.8 Flash Culinary Intelligence</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-serif font-bold tracking-tight">AI Kitchen Studio</h1>
             <p className="text-sm text-white/90 mt-2 leading-relaxed">

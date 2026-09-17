@@ -51,7 +51,7 @@ export default function App() {
     setActiveTab(tab);
   };
 
-  // Modals
+  // Modals & Navigation
   const [isCreateEditModalOpen, setIsCreateEditModalOpen] = useState<boolean>(false);
   const [recipeToEdit, setRecipeToEdit] = useState<Recipe | null>(null);
   const [selectedRecipeForDetail, setSelectedRecipeForDetail] = useState<Recipe | null>(null);
@@ -59,6 +59,14 @@ export default function App() {
   const [recipeForCollection, setRecipeForCollection] = useState<Recipe | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
+  const [aiInitialSubTab, setAiInitialSubTab] = useState<'generator' | 'assistant' | 'substitute' | 'improve'>('generator');
+  const [aiInitialQuery, setAiInitialQuery] = useState<string>('');
+
+  const handleOpenAskAi = (prompt?: string) => {
+    setAiInitialSubTab('assistant');
+    setAiInitialQuery(prompt || '');
+    setActiveTab('ai-kitchen');
+  };
 
   // Core Data States
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
@@ -385,6 +393,7 @@ export default function App() {
               setRecipeToEdit(null);
               setIsCreateEditModalOpen(true);
             }}
+            onOpenAskAi={handleOpenAskAi}
             onNavigate={(tab) => {
               if (tab === 'create-recipe') {
                 setRecipeToEdit(null);
@@ -412,11 +421,16 @@ export default function App() {
         {(activeTab === 'generator' || activeTab === 'ai-kitchen') && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <AiKitchenView
+              key={`${aiInitialSubTab}-${aiInitialQuery}`}
+              recipes={recipes}
               pantryItems={pantryItems}
+              initialSubTab={activeTab === 'generator' ? 'generator' : aiInitialSubTab}
+              initialQuery={aiInitialQuery}
               onRecipeGenerated={(newRec) => {
                 handleSaveRecipe(newRec);
                 setSelectedRecipeForDetail(newRec);
               }}
+              onSaveRecipe={handleSaveRecipe}
               onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
               onStartCooking={handleStartCooking}
               onToggleSave={handleToggleSave}

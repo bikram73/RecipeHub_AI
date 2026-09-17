@@ -155,31 +155,78 @@ export async function askCulinaryAssistant(
     });
     if (res.ok) {
       const data = await res.json();
-      if (data.reply) return data.reply;
+      if (data.reply && typeof data.reply === 'string' && data.reply.trim().length > 0) {
+        return data.reply;
+      }
     }
   } catch (err) {
     console.warn('Backend chat API offline, using fallback response', err);
   }
 
-  // Resilient heuristic responses
+  // Resilient heuristic responses for common culinary queries
   const qLower = question.toLowerCase();
-  if (qLower.includes('butter') || qLower.includes('substitute')) {
-    return `For butter substitutes:
-1. **Olive Oil / Avocado Oil**: Use a 3:4 ratio (3/4 cup oil for 1 cup butter). Ideal for sautéing and rustic baking.
-2. **Coconut Oil**: 1:1 ratio. Great for high-heat cooking and rich vegan pastries.
-3. **Greek Yogurt or Applesauce**: 1:1 ratio for tender, low-fat cakes and muffins.`;
-  }
-  if (qLower.includes('rice') || qLower.includes('cook time')) {
-    return `For standard long-grain white rice, use a 1:2 ratio (1 cup rice to 2 cups boiling salted water). Simmer covered on lowest flame for 15 minutes, remove from heat, and let steam with the lid on for 10 minutes before fluffing with a fork.`;
-  }
-  if (qLower.includes('healthy') || qLower.includes('calories')) {
-    return `To make most meals lighter:
-- Swap heavy cream with cashew cream or blended silken tofu.
-- Boost umami with roasted garlic, nutritional yeast, and reduced-sodium tamari.
-- Double the vegetable volume (e.g. spiralized zucchini or cauliflower mash) to increase fiber while reducing carbohydrates.`;
+
+  if (qLower.includes('chicken') && (qLower.includes('bake') || qLower.includes('temperature') || qLower.includes('400') || qLower.includes('time'))) {
+    return `For boneless, skinless chicken breasts:
+- **At 400°F (200°C)**: Bake for **20–25 minutes** until internal temperature reaches **165°F (74°C)**.
+- **Chef Tip**: Brush lightly with olive oil, season generously with smoked paprika, garlic powder, salt and pepper. Rest for 5 minutes before slicing to lock in all the juices.`;
   }
 
-  return `Chef Gemini tip: When cooking ${contextRecipe ? contextRecipe.title : 'this dish'}, balance the four flavor pillars — Salt, Fat, Acid (lemon/vinegar), and Heat (black pepper/chili). Taste frequently at each stage of reduction!`;
+  if (qLower.includes('salmon') || (qLower.includes('fish') && qLower.includes('bake'))) {
+    return `For salmon fillets:
+- **At 400°F (200°C)**: Bake for **12–15 minutes** (until flesh flakes easily with a fork, internal temp **125°F–130°F for medium**).
+- **Searing method**: Sear skin-side down in a hot skillet with olive oil for 4 minutes until crispy, then flip for 2 minutes to finish.`;
+  }
+
+  if (qLower.includes('butter') || qLower.includes('substitute')) {
+    return `Top butter substitutes:
+1. **Olive Oil / Avocado Oil**: Use a 3:4 ratio (3/4 cup oil for 1 cup butter). Ideal for pan sautéing and savory baking.
+2. **Coconut Oil**: 1:1 ratio. Great for high-heat cooking and rich vegan pastries.
+3. **Greek Yogurt or Applesauce**: 1:1 ratio for tender, low-fat cakes, muffins, and quick breads.`;
+  }
+
+  if (qLower.includes('heavy cream') || qLower.includes('cream')) {
+    return `Best heavy cream alternatives:
+1. **Full-Fat Coconut Milk or Cashew Cream**: 1:1 ratio. Silky, rich, and naturally plant-based.
+2. **Whole Milk + Melted Butter**: 3/4 cup whole milk + 1/4 cup melted butter.
+3. **Greek Yogurt / Sour Cream**: 1:1 ratio thinned with a splash of milk for savory pan sauces.`;
+  }
+
+  if (qLower.includes('rice') || qLower.includes('sticky')) {
+    return `How to make perfect non-sticky rice:
+1. **Rinse**: Rinse rice in cold water 3–4 times until water runs clear to remove excess surface starch.
+2. **Ratio**: Use 1:1.75 ratio for Jasmine/Basmati, or 1:2 for standard long-grain white.
+3. **Simmer**: Bring to boil, cover tightly, reduce heat to low for 15 mins.
+4. **Rest**: Remove from heat and let steam covered for 10 mins without lifting the lid, then fluff gently with a fork.`;
+  }
+
+  if (qLower.includes('salt') || qLower.includes('salted')) {
+    return `How to fix an overly salty dish:
+- **Acid & Sweetness**: Add a splash of fresh lemon juice, apple cider vinegar, or a pinch of brown sugar to counterbalance salinity.
+- **Dairy / Fat**: Stir in heavy cream, coconut milk, butter, or Greek yogurt to dilute the salt intensity.
+- **Starch**: Add raw peeled potato chunks to simmered soups/stews (they absorb excess sodium), or double the liquid/unsalted broth.`;
+  }
+
+  if (qLower.includes('healthy') || qLower.includes('calories') || qLower.includes('protein')) {
+    return `Culinary tips to elevate nutrition:
+- **Boost Protein**: Fold in cooked lentils, edamame, Greek yogurt, or hemp seeds into sauces.
+- **Reduce Saturated Fat**: Swap butter/cream for pureed roasted garlic, cashew cream, or extra-virgin olive oil.
+- **Double Vegetables**: Bulk up pasta dishes with zucchini noodles, cauliflower rice, or sautéed spinach.`;
+  }
+
+  if (qLower.includes('15 minute') || qLower.includes('quick') || qLower.includes('fast')) {
+    return `Quick 15-minute meal formula:
+1. **Protein**: Pan-seared shrimp, diced chicken cutlets, or canned chickpeas.
+2. **Aromatics**: Sauté minced garlic, ginger, and scallions in hot sesame or olive oil (2 mins).
+3. **Base & Greens**: Toss with quick-boil ramen/udon noodles or pre-cooked quinoa, fresh baby spinach, and cherry tomatoes.
+4. **Sauce**: Whisk 1 tbsp soy sauce, 1 tsp maple syrup, 1 tsp chili crisp, and a squeeze of lime!`;
+  }
+
+  return `Chef Gemini recommendation:
+When preparing ${contextRecipe ? `"${contextRecipe.title}"` : 'your dish'}, remember the core secret to gourmet restaurant flavor:
+1. **Season in layers**: Salt meat before searing, season sautéed aromatics, and adjust at final plating.
+2. **Balance with acid**: If a dish feels heavy, a squeeze of fresh lemon juice or dash of sherry vinegar instantly brightens it.
+3. **Sear for fond**: Caramelize ingredients deeply in the pan, then deglaze with wine or broth for incredible flavor depth.`;
 }
 
 // 3. INGREDIENT SUBSTITUTION
