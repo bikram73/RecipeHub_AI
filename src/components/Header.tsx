@@ -195,110 +195,166 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* Mobile Menu Toggle Button */}
+          {/* Hub Menu Toggle Button (Available on Desktop and Mobile) */}
           <button
             id="header-mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+            title={mobileMenuOpen ? 'Close Menu' : 'Open Navigation & Tools Menu'}
+            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl border transition-all cursor-pointer flex items-center justify-center ${
+              mobileMenuOpen
+                ? 'bg-[#fef1ea] text-[#9f3d00] border-[#9f3d00] shadow-xs'
+                : 'border-[#e1bfb2]/50 hover:border-[#9f3d00] text-[#594137] hover:text-[#9f3d00] hover:bg-[#fef1ea] bg-white'
+            }`}
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Quick Hub Navigation & Tools Drawer (Desktop & Mobile) */}
       {mobileMenuOpen && (
-        <div className="xl:hidden bg-white border-b border-gray-200 p-4 space-y-3 animate-in slide-in-from-top duration-200 shadow-xl max-h-[80vh] overflow-y-auto">
-          {/* Mobile Search */}
-          <div className="relative">
-            <Search className="absolute left-3.5 top-2.5 text-[#594137] w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search dishes, ingredients, chefs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSearchSubmit();
-                  setMobileMenuOpen(false);
-                }
-              }}
-              className="w-full bg-[#fef1ea] pl-10 pr-4 py-2 text-xs rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#9f3d00]"
-            />
-          </div>
-
-          {/* Navigation Links Grid */}
-          <div className="grid grid-cols-2 gap-2">
-            {navLinks.map(({ id, label, icon: Icon, count }) => (
-              <button
-                key={id}
-                onClick={() => {
-                  setActiveTab(id as any);
-                  setMobileMenuOpen(false);
+        <div className="bg-white/98 backdrop-blur-md border-b border-[#e1bfb2]/60 shadow-xl max-h-[85vh] overflow-y-auto animate-in slide-in-from-top-2 duration-200">
+          <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
+            
+            {/* Quick Header Search on Mobile/Tablet */}
+            <div className="relative md:hidden">
+              <Search className="absolute left-3.5 top-3 text-[#594137] w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search recipes, ingredients, chefs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearchSubmit();
+                    setMobileMenuOpen(false);
+                  }
                 }}
-                className={`p-3 rounded-xl flex items-center gap-2 text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === id
-                    ? 'bg-[#9f3d00] text-white'
-                    : 'bg-[#faf6f3] text-gray-700 hover:bg-[#f3ece6]'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{label}</span>
-                {count !== undefined && count > 0 && (
-                  <span className={`ml-auto px-1.5 py-0.5 rounded-full text-[10px] ${
-                    activeTab === id ? 'bg-white/20 text-white' : 'bg-[#9f3d00] text-white'
-                  }`}>
-                    {count}
-                  </span>
+                className="w-full bg-[#fef1ea] pl-10 pr-4 py-2.5 text-xs rounded-xl text-[#201a17] focus:outline-none focus:ring-2 focus:ring-[#9f3d00] border border-transparent focus:border-[#9f3d00]"
+              />
+            </div>
+
+            {/* Quick Navigation Section */}
+            <div>
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-[11px] font-bold text-[#8d7165] uppercase tracking-wider">
+                  Navigation & Kitchen Studios
+                </span>
+                <span className="text-[11px] text-[#9f3d00] font-medium hidden sm:inline">
+                  Click any studio to jump directly
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+                {navLinks.map(({ id, label, icon: Icon, badge, count }) => {
+                  const isActive = activeTab === id || (id === 'ai-kitchen' && activeTab === 'generator');
+                  return (
+                    <button
+                      key={id}
+                      onClick={() => {
+                        setActiveTab(id as any);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 text-xs font-bold transition-all cursor-pointer text-center ${
+                        isActive
+                          ? 'bg-[#9f3d00] text-white shadow-md shadow-[#9f3d00]/20'
+                          : 'bg-[#faf6f3] text-[#594137] hover:text-[#201a17] hover:bg-[#f3ece6] border border-transparent hover:border-[#e1bfb2]/60'
+                      }`}
+                    >
+                      <div className="flex items-center justify-center gap-1">
+                        <Icon className="w-4 h-4" />
+                        {badge && <span className="text-[10px]">{badge}</span>}
+                      </div>
+                      <span className="truncate w-full">{label}</span>
+                      {count !== undefined && count > 0 && (
+                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                          isActive ? 'bg-white/25 text-white' : 'bg-[#9f3d00] text-white'
+                        }`}>
+                          {count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quick Actions & Chef Tools Bar */}
+            <div className="pt-3 border-t border-[#e1bfb2]/40 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                {onOpenCreateRecipe && (
+                  <button
+                    onClick={() => {
+                      onOpenCreateRecipe();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-4 py-2.5 bg-[#9f3d00] hover:bg-[#c74e00] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Create New Recipe</span>
+                  </button>
                 )}
-              </button>
-            ))}
-          </div>
 
-          {/* Extra Actions Bar */}
-          <div className="pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
-            {onOpenCreateRecipe && (
-              <button
-                onClick={() => {
-                  onOpenCreateRecipe();
-                  setMobileMenuOpen(false);
-                }}
-                className="flex-1 py-2.5 bg-[#9f3d00] hover:bg-[#c74e00] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create Recipe</span>
-              </button>
-            )}
+                <button
+                  onClick={() => {
+                    setActiveTab('ai-kitchen');
+                    setMobileMenuOpen(false);
+                  }}
+                  className="px-4 py-2.5 bg-gradient-to-r from-[#9f3d00]/10 to-[#c74e00]/10 hover:from-[#9f3d00]/20 hover:to-[#c74e00]/20 text-[#9f3d00] border border-[#9f3d00]/30 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>AI Sommelier Assistant</span>
+                </button>
+              </div>
 
-            <button
-              onClick={() => {
-                setActiveTab('profile');
-                setMobileMenuOpen(false);
-              }}
-              className={`p-2.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'profile'
-                  ? 'bg-[#fef1ea] text-[#9f3d00] border-[#9f3d00]'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <ChefHat className="w-4 h-4" />
-              <span>Profile</span>
-            </button>
+              <div className="flex items-center gap-2 ml-auto">
+                <button
+                  onClick={() => {
+                    setActiveTab('activity');
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all ${
+                    activeTab === 'activity'
+                      ? 'bg-[#fef1ea] text-[#9f3d00] border-[#9f3d00]'
+                      : 'border-[#e1bfb2]/60 text-[#594137] hover:bg-[#faf6f3]'
+                  }`}
+                >
+                  <Activity className="w-4 h-4" />
+                  <span>Activity</span>
+                </button>
 
-            <button
-              onClick={() => {
-                setActiveTab('settings');
-                setMobileMenuOpen(false);
-              }}
-              className={`p-2.5 rounded-xl border cursor-pointer ${
-                activeTab === 'settings'
-                  ? 'bg-[#fef1ea] text-[#9f3d00] border-[#9f3d00]'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <Settings className="w-4 h-4" />
-            </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('profile');
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all ${
+                    activeTab === 'profile'
+                      ? 'bg-[#fef1ea] text-[#9f3d00] border-[#9f3d00]'
+                      : 'border-[#e1bfb2]/60 text-[#594137] hover:bg-[#faf6f3]'
+                  }`}
+                >
+                  <ChefHat className="w-4 h-4" />
+                  <span>Profile</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setActiveTab('settings');
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all ${
+                    activeTab === 'settings'
+                      ? 'bg-[#fef1ea] text-[#9f3d00] border-[#9f3d00]'
+                      : 'border-[#e1bfb2]/60 text-[#594137] hover:bg-[#faf6f3]'
+                  }`}
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Settings</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}
