@@ -47,17 +47,17 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(41,35,31,0.04)] border-b border-[#e1bfb2]/30">
-      <div className="h-20 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex items-center justify-between gap-4 lg:gap-6">
+      <div className="h-20 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex items-center justify-between gap-3 lg:gap-4">
         
-        {/* Left Side: Brand Logo & Desktop Navigation */}
-        <div className="flex items-center gap-6 xl:gap-8 shrink-0">
+        {/* Left Side: Brand Logo */}
+        <div className="flex items-center shrink-0">
           <div 
             id="brand-logo"
             onClick={() => {
               setActiveTab('home');
               setMobileMenuOpen(false);
             }}
-            className="flex items-center gap-3 cursor-pointer group shrink-0 select-none"
+            className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group shrink-0 select-none"
           >
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#9f3d00] to-[#c74e00] flex items-center justify-center text-white shadow-md shadow-[#9f3d00]/25 group-hover:scale-105 transition-all duration-200">
               <ChefHat className="w-5 h-5 text-white" />
@@ -67,38 +67,38 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-[#9f3d00] italic font-serif">AI</span>
             </span>
           </div>
-
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold">
-            {navLinks.map(({ id, label, icon: Icon, badge, count }) => {
-              const isActive = activeTab === id || (id === 'ai-kitchen' && activeTab === 'generator');
-              return (
-                <button
-                  key={id}
-                  id={`header-nav-${id}`}
-                  onClick={() => setActiveTab(id as any)}
-                  className={`transition-all px-3 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                    isActive
-                      ? 'text-[#9f3d00] font-bold bg-[#fef1ea] shadow-2xs'
-                      : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{label}</span>
-                  {badge && <span className="text-[11px] leading-none">{badge}</span>}
-                  {count !== undefined && count > 0 && (
-                    <span className="ml-0.5 px-1.5 py-0.5 bg-[#9f3d00] text-white text-[10px] rounded-full font-bold leading-none">
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
         </div>
 
+        {/* Center: Desktop Navigation Bar */}
+        <nav className="hidden lg:flex items-center justify-center gap-0.5 xl:gap-1 text-xs font-semibold">
+          {navLinks.map(({ id, label, icon: Icon, badge, count }) => {
+            const isActive = activeTab === id || (id === 'ai-kitchen' && activeTab === 'generator');
+            return (
+              <button
+                key={id}
+                id={`header-nav-${id}`}
+                onClick={() => setActiveTab(id as any)}
+                className={`transition-all px-2.5 xl:px-3 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                  isActive
+                    ? 'text-[#9f3d00] font-bold bg-[#fef1ea] shadow-2xs'
+                    : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
+                }`}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                <span>{label}</span>
+                {badge && <span className="text-[11px] leading-none">{badge}</span>}
+                {count !== undefined && count > 0 && (
+                  <span className="ml-0.5 px-1.5 py-0.5 bg-[#9f3d00] text-white text-[10px] rounded-full font-bold leading-none">
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
         {/* Right Side: Search, Create Action, Activity, Settings, Profile */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center justify-end gap-2 sm:gap-2.5 shrink-0">
           
           {/* Header Search Input */}
           <div className="relative hidden md:flex items-center">
@@ -120,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({
                   handleSearchSubmit();
                 }
               }}
-              className="w-36 lg:w-48 xl:w-56 bg-[#fef1ea] pl-9 pr-7 py-2 rounded-xl text-xs text-[#201a17] placeholder:text-[#8d7165] outline-none focus:bg-white focus:ring-2 focus:ring-[#9f3d00] transition-all font-medium border border-transparent focus:border-[#9f3d00]"
+              className="w-32 lg:w-40 xl:w-52 bg-[#fef1ea] pl-9 pr-7 py-2 rounded-xl text-xs text-[#201a17] placeholder:text-[#8d7165] outline-none focus:bg-white focus:ring-2 focus:ring-[#9f3d00] transition-all font-medium border border-transparent focus:border-[#9f3d00]"
             />
             {searchQuery && (
               <button
@@ -178,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="header-profile-btn"
               onClick={() => setActiveTab('profile')}
               title={`Chef Profile: ${profile.name || 'Your Profile'}`}
-              className={`flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-xl border transition-all cursor-pointer ${
+              className={`flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-xl border transition-all cursor-pointer ${
                 activeTab === 'profile'
                   ? 'bg-[#fef1ea] border-[#9f3d00] text-[#9f3d00]'
                   : 'bg-white border-[#e1bfb2]/60 hover:border-[#9f3d00] text-[#201a17]'
@@ -189,7 +189,7 @@ export const Header: React.FC<HeaderProps> = ({
                 alt={profile.name || 'Profile'}
                 className="w-7 h-7 rounded-lg object-cover ring-1 ring-[#9f3d00]/30 shrink-0"
               />
-              <span className="text-xs font-bold truncate max-w-[80px] xl:max-w-[110px] hidden sm:inline">
+              <span className="text-xs font-bold truncate max-w-[80px] xl:max-w-[100px] hidden sm:inline">
                 {profile.name || 'Chef'}
               </span>
             </button>
