@@ -548,13 +548,6 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
             
             {/* Left Hero Narrative */}
             <div className="lg:col-span-6 flex flex-col items-start gap-4">
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#fef1ea] shadow-xs border border-[#e1bfb2]/50">
-                <span className="material-symbols-outlined text-[#9f3d00] text-[18px]">auto_awesome</span>
-                <span className="text-[11px] text-[#594137] uppercase tracking-wider font-semibold">
-                  AI CULINARY SOMMELIER & RECIPE FORGE
-                </span>
-              </div>
-
               <h1 className="font-serif text-4xl sm:text-5xl lg:text-[56px] leading-[1.12] text-[#201a17] tracking-tight font-bold">
                 Discover Your Next <span className="italic font-serif text-[#9f3d00] font-normal">Favorite</span> Recipe
               </h1>
