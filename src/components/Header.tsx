@@ -76,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="h-20 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex items-center justify-between gap-4">
         
         {/* Left Side: Brand Logo & Desktop Navigation */}
-        <div className="flex items-center gap-6 xl:gap-8 min-w-0">
+        <div className="flex items-center gap-4 xl:gap-6 min-w-0">
           <div 
             id="brand-logo"
             onClick={() => {
@@ -95,8 +95,8 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
-          {/* Desktop Navigation Links (Reduced list with Tools Dropdown Component) */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 text-xs font-semibold shrink-0">
+          {/* Desktop Navigation Links (Clean fixed-width labels to prevent shifting/overlap) */}
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 text-xs font-semibold shrink-0">
             {primaryNavLinks.map(({ id, label, icon: Icon, badge, count }) => {
               const isActive = activeTab === id || (id === 'ai-kitchen' && activeTab === 'generator');
               return (
@@ -107,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
                     setActiveTab(id as any);
                     setToolsDropdownOpen(false);
                   }}
-                  className={`transition-all px-3 py-1.5 rounded-xl flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                  className={`transition-all px-2.5 xl:px-3 py-1.5 rounded-xl flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 select-none ${
                     isActive
                       ? 'text-[#9f3d00] font-bold bg-[#fef1ea] shadow-2xs'
                       : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
@@ -126,22 +126,27 @@ export const Header: React.FC<HeaderProps> = ({
             })}
 
             {/* Desktop Tools Dropdown Menu Component */}
-            <div className="relative" ref={toolsDropdownRef}>
+            <div className="relative shrink-0" ref={toolsDropdownRef}>
               <button
                 id="header-nav-tools-dropdown"
                 onClick={() => setToolsDropdownOpen(!toolsDropdownOpen)}
-                className={`transition-all px-3 py-1.5 rounded-xl flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                className={`transition-all px-2.5 xl:px-3 py-1.5 rounded-xl flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 select-none ${
                   isToolActive || toolsDropdownOpen
                     ? 'text-[#9f3d00] font-bold bg-[#fef1ea] shadow-2xs ring-1 ring-[#9f3d00]/30'
                     : 'text-[#594137] hover:text-[#201a17] hover:bg-[#f8ece5]'
                 }`}
               >
                 <Layers className="w-3.5 h-3.5 text-[#9f3d00] shrink-0" />
-                <span>{isToolActive && activeToolItem ? activeToolItem.label : 'Tools'}</span>
-                {savedCount > 0 && !isToolActive && (
-                  <span className="w-2 h-2 rounded-full bg-[#9f3d00]" />
+                <span>Tools</span>
+                {isToolActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#9f3d00] shrink-0 animate-pulse" />
                 )}
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${toolsDropdownOpen ? 'rotate-180 text-[#9f3d00]' : 'text-gray-400'}`} />
+                {savedCount > 0 && !isToolActive && (
+                  <span className="px-1.5 py-0.2 bg-[#9f3d00] text-white text-[10px] rounded-full font-bold leading-none">
+                    {savedCount}
+                  </span>
+                )}
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 shrink-0 ${toolsDropdownOpen ? 'rotate-180 text-[#9f3d00]' : 'text-gray-400'}`} />
               </button>
 
               {/* Tools Dropdown Panel */}
@@ -218,7 +223,7 @@ export const Header: React.FC<HeaderProps> = ({
                   handleSearchSubmit();
                 }
               }}
-              className="w-28 lg:w-36 xl:w-48 bg-[#fef1ea] pl-8 pr-6 py-1.5 rounded-xl text-xs text-[#201a17] placeholder:text-[#8d7165] outline-none focus:bg-white focus:ring-2 focus:ring-[#9f3d00] transition-all font-medium border border-transparent focus:border-[#9f3d00]"
+              className="w-24 lg:w-28 xl:w-44 bg-[#fef1ea] pl-8 pr-6 py-1.5 rounded-xl text-xs text-[#201a17] placeholder:text-[#8d7165] outline-none focus:bg-white focus:ring-2 focus:ring-[#9f3d00] transition-all font-medium border border-transparent focus:border-[#9f3d00]"
             />
             {searchQuery && (
               <button
