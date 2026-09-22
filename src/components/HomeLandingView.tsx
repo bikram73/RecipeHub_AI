@@ -536,28 +536,33 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
   return (
     <div className="w-full flex flex-col antialiased text-[#201a17]">
       {/* Top Ambient Kitchen Glow Overlays */}
-      <div className="relative w-full overflow-hidden pb-16">
-        <div className="absolute -top-24 -left-20 w-96 h-96 rounded-full bg-[#ffab69]/20 blur-3xl pointer-events-none" />
-        <div className="absolute top-10 -right-20 w-[28rem] h-[28rem] rounded-full bg-[#ffdbcd]/35 blur-3xl pointer-events-none" />
+      <div className="relative w-full overflow-hidden pb-12 sm:pb-16">
+        <div className="absolute -top-24 -left-20 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-[#ffab69]/20 blur-3xl pointer-events-none" />
+        <div className="absolute top-10 -right-20 w-72 sm:w-[28rem] h-72 sm:h-[28rem] rounded-full bg-[#ffdbcd]/35 blur-3xl pointer-events-none" />
 
-        {/* Content Container with Generous Side Margins and Alignment */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
+        {/* Content Container with Responsive Side Margins */}
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-10 sm:space-y-16">
           {/* 1. HERO SECTION */}
-          <section className="relative pt-4 lg:pt-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <section className="relative pt-2 sm:pt-4 lg:pt-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
             
             {/* Left Hero Narrative */}
-            <div className="lg:col-span-6 flex flex-col items-start gap-4">
-              <h1 className="font-serif text-4xl sm:text-5xl lg:text-[56px] leading-[1.12] text-[#201a17] tracking-tight font-bold">
+            <div className="lg:col-span-6 flex flex-col items-start gap-3 sm:gap-4">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fef1ea] border border-[#9f3d00]/20 text-[#9f3d00] text-xs font-bold">
+                <span className="material-symbols-outlined text-[16px] text-[#9f3d00]">restaurant</span>
+                <span>The Intelligent Recipe Platform</span>
+              </div>
+
+              <h1 className="font-serif text-3xl sm:text-5xl lg:text-[56px] leading-[1.15] text-[#201a17] tracking-tight font-bold">
                 Discover Your Next <span className="italic font-serif text-[#9f3d00] font-normal">Favorite</span> Recipe
               </h1>
 
-              <p className="text-base sm:text-lg text-[#594137] max-w-xl leading-relaxed">
+              <p className="text-sm sm:text-base lg:text-lg text-[#594137] max-w-xl leading-relaxed">
                 Explore delicious seasonal recipes, discover adventurous culinary pairings, and let personalized Gemini intelligence turn your pantry ingredients into restaurant-grade meals.
               </p>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2 relative z-30">
+              {/* Action Buttons - Stack on mobile, inline on tablet/desktop */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-2 w-full sm:w-auto relative z-30">
                 <button
                   type="button"
                   id="hero-explore-btn"
@@ -566,7 +571,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                     e.stopPropagation();
                     onNavigate('explore');
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-[#9f3d00] hover:bg-[#c74e00] text-white font-semibold text-base rounded-xl shadow-md shadow-[#9f3d00]/25 transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer select-none"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#9f3d00] hover:bg-[#c74e00] text-white font-semibold text-sm sm:text-base rounded-xl shadow-md shadow-[#9f3d00]/25 transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer select-none"
                 >
                   <span>Explore Recipes</span>
                   <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
@@ -584,7 +589,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                       onNavigate('create-recipe');
                     }
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-[#f8ece5] hover:bg-[#f2e6df] text-[#9f3d00] font-semibold text-base rounded-xl shadow-xs transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer select-none border border-[#e1bfb2]/40 hover:border-[#9f3d00]/40"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#f8ece5] hover:bg-[#f2e6df] text-[#9f3d00] font-semibold text-sm sm:text-base rounded-xl shadow-xs transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer select-none border border-[#e1bfb2]/40 hover:border-[#9f3d00]/40"
                   title="Create and publish your custom recipe"
                 >
                   <span className="material-symbols-outlined text-[20px]">post_add</span>
@@ -603,7 +608,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                       onNavigate('ai-kitchen');
                     }
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-white text-[#783d01] font-semibold text-base rounded-xl shadow-md hover:shadow-lg border border-[#e1bfb2]/50 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:scale-95 select-none"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-[#783d01] font-semibold text-sm sm:text-base rounded-xl shadow-md hover:shadow-lg border border-[#e1bfb2]/50 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:scale-95 select-none"
                   title="Open Gemini AI Culinary Sommelier"
                 >
                   <span className="material-symbols-outlined text-[#8e4e14] text-[20px]">psychology</span>
@@ -613,28 +618,28 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
               </div>
 
               {/* Micro Proof Metric Row */}
-              <div className="flex items-center gap-4 pt-3">
+              <div className="flex items-center gap-3 sm:gap-4 pt-2 sm:pt-3">
                 <div className="flex items-center -space-x-2">
-                  <span className="w-8 h-8 rounded-full bg-[#ffb596] flex items-center justify-center text-[#7c2e00] font-bold text-xs shadow-xs border-2 border-white">CL</span>
-                  <span className="w-8 h-8 rounded-full bg-[#ffdbcd] flex items-center justify-center text-[#9f3d00] font-bold text-xs shadow-xs border-2 border-white">SR</span>
-                  <span className="w-8 h-8 rounded-full bg-[#8cf5e4] flex items-center justify-center text-[#00685d] font-bold text-xs shadow-xs border-2 border-white">ER</span>
-                  <span className="w-8 h-8 rounded-full bg-[#ffdcc4] flex items-center justify-center text-[#8e4e14] font-bold text-xs shadow-xs border-2 border-white">ML</span>
-                  <span className="w-8 h-8 rounded-full bg-[#ece0da] flex items-center justify-center text-[#594137] font-bold text-xs shadow-xs border-2 border-white">+9k</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#ffb596] flex items-center justify-center text-[#7c2e00] font-bold text-xs shadow-xs border-2 border-white">CL</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#ffdbcd] flex items-center justify-center text-[#9f3d00] font-bold text-xs shadow-xs border-2 border-white">SR</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#8cf5e4] flex items-center justify-center text-[#00685d] font-bold text-xs shadow-xs border-2 border-white">ER</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#ffdcc4] flex items-center justify-center text-[#8e4e14] font-bold text-xs shadow-xs border-2 border-white">ML</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#ece0da] flex items-center justify-center text-[#594137] font-bold text-xs shadow-xs border-2 border-white">+9k</span>
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[16px] text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                    <span className="text-sm text-[#201a17] font-bold">4.9 / 5</span>
+                    <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                    <span className="text-xs sm:text-sm text-[#201a17] font-bold">4.9 / 5</span>
                   </div>
-                  <span className="text-xs text-[#594137]">Over 12,000 tested home recipes</span>
+                  <span className="text-[11px] sm:text-xs text-[#594137]">Over 12,000 tested home recipes</span>
                 </div>
               </div>
 
             </div>
 
             {/* Right Hero Visual Collage */}
-            <div className="lg:col-span-6 relative">
-              <div className="grid grid-cols-2 gap-3.5 relative">
+            <div className="lg:col-span-6 relative mt-2 lg:mt-0">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 relative">
                 
                 {/* Dish 1: Tuscan Salmon */}
                 <div 
@@ -648,21 +653,21 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                       alt="Creamy Tuscan Garlic Salmon"
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
                     
-                    <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[#9f3d00] text-xs font-semibold flex items-center gap-1 shadow-xs">
-                      <span className="material-symbols-outlined text-[14px]">timer</span> 20 min
+                    <span className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 bg-white/90 backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[#9f3d00] text-[10px] sm:text-xs font-semibold flex items-center gap-1 shadow-xs">
+                      <span className="material-symbols-outlined text-[13px] sm:text-[14px]">timer</span> 20 min
                     </span>
 
-                    <div className="absolute bottom-3 left-3 right-3 text-white">
-                      <span className="text-[11px] uppercase tracking-wider text-[#ffdcc4] font-semibold">Chef Signature</span>
-                      <h3 className="font-serif text-lg sm:text-xl text-white font-bold leading-tight drop-shadow-xs">Creamy Tuscan Salmon</h3>
+                    <div className="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-3 sm:left-3 sm:right-3 text-white">
+                      <span className="text-[9px] sm:text-[11px] uppercase tracking-wider text-[#ffdcc4] font-semibold">Chef Signature</span>
+                      <h3 className="font-serif text-sm sm:text-xl text-white font-bold leading-tight drop-shadow-xs">Creamy Tuscan Salmon</h3>
                     </div>
                   </div>
                 </div>
 
                 {/* Vertical Stack on Right */}
-                <div className="flex flex-col gap-3.5">
+                <div className="flex flex-col gap-2.5 sm:gap-3.5">
                   
                   {/* Dish 2: Sourdough Bread */}
                   <div 
@@ -676,12 +681,12 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                         alt="Golden Sourdough"
                         referrerPolicy="no-referrer"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <span className="absolute top-3 right-3 bg-[#00685d] text-white text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-xs">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      <span className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-[#00685d] text-white text-[9px] sm:text-[11px] font-semibold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-xs">
                         Slow Ferment
                       </span>
-                      <div className="absolute bottom-3 left-3 right-3 text-white">
-                        <p className="font-bold text-sm sm:text-base text-white drop-shadow-xs">Golden Sourdough</p>
+                      <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 text-white">
+                        <p className="font-bold text-xs sm:text-base text-white drop-shadow-xs">Golden Sourdough</p>
                       </div>
                     </div>
                   </div>
@@ -698,12 +703,12 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                         alt="Basil Pesto Rigatoni"
                         referrerPolicy="no-referrer"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-[#00685d] text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#00685d]" /> 15-Min Quick
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      <span className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/90 backdrop-blur-md text-[#00685d] text-[9px] sm:text-[11px] font-semibold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full flex items-center gap-1 shadow-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#00685d]" /> 15m Quick
                       </span>
-                      <div className="absolute bottom-3 left-3 right-3 text-white">
-                        <p className="font-bold text-sm sm:text-base text-white drop-shadow-xs">Basil Pesto Rigatoni</p>
+                      <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 text-white">
+                        <p className="font-bold text-xs sm:text-base text-white drop-shadow-xs">Basil Pesto Rigatoni</p>
                       </div>
                     </div>
                   </div>
@@ -714,18 +719,18 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
               {/* Overlapping Decorative AI Tip Floating Card */}
               <div 
                 onClick={() => onSelectRecipe(heroTuscanSalmon)}
-                className="hidden sm:flex absolute -bottom-5 -left-6 z-20 items-center gap-3 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl shadow-xl border border-[#e1bfb2]/40 max-w-xs cursor-pointer hover:scale-105 transition-transform"
+                className="mt-3 sm:mt-0 sm:absolute sm:-bottom-5 sm:-left-6 z-20 flex items-center gap-3 bg-white/95 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl shadow-lg border border-[#e1bfb2]/40 max-w-full sm:max-w-xs cursor-pointer hover:scale-102 transition-transform"
                 title="View Tuscan Salmon Recipe Tips"
               >
-                <div className="w-10 h-10 rounded-xl bg-[#ffdbcd] flex items-center justify-center shrink-0 text-[#9f3d00]">
-                  <span className="material-symbols-outlined text-[24px]">soup_kitchen</span>
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#ffdbcd] flex items-center justify-center shrink-0 text-[#9f3d00]">
+                  <span className="material-symbols-outlined text-[20px] sm:text-[24px]">soup_kitchen</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs text-[#201a17] font-bold flex items-center gap-1">
                     <span>Gemini Kitchen Insight</span>
                     <span className="text-[10px] text-[#9f3d00] font-bold">✨ Tap to cook</span>
                   </span>
-                  <span className="text-xs text-[#594137]">"Substitute coconut cream for lactose-free Tuscan salmon!"</span>
+                  <span className="text-[11px] sm:text-xs text-[#594137]">"Substitute coconut cream for lactose-free Tuscan salmon!"</span>
                 </div>
               </div>
 
@@ -735,44 +740,54 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
         </section>
 
         {/* 2. SEARCH & DISCOVERY BAR */}
-        <section className="mt-14 relative z-20">
-          <div className="bg-white rounded-2xl shadow-lg border border-[#e1bfb2]/30 p-4 sm:p-5 flex flex-col gap-3">
+        <section className="mt-8 sm:mt-14 relative z-20">
+          <div className="bg-white rounded-2xl shadow-lg border border-[#e1bfb2]/30 p-3.5 sm:p-5 flex flex-col gap-3">
             
-            <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+            <form onSubmit={handleSearchSubmit} className="flex flex-col gap-2.5">
               <div className="relative flex-1 flex items-center">
-                <span className="material-symbols-outlined absolute left-4 text-[#594137] text-[22px] pointer-events-none">search</span>
+                <span className="material-symbols-outlined absolute left-3.5 text-[#594137] text-[20px] pointer-events-none">search</span>
                 <input
                   id="recipe-search-input"
                   type="text"
-                  placeholder="Search recipes, ingredients, cuisines (e.g., 'creamy chicken pasta', 'avocado toast')..."
+                  placeholder="Search recipes, ingredients, cuisines..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="w-full bg-[#fef1ea] pl-12 pr-12 py-3.5 rounded-xl text-sm text-[#201a17] placeholder:text-[#8d7165] outline-none focus:bg-white focus:ring-2 focus:ring-[#9f3d00]/30 transition-all"
+                  className="w-full bg-[#fef1ea] pl-11 pr-20 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm text-[#201a17] placeholder:text-[#8d7165] outline-none focus:bg-white focus:ring-2 focus:ring-[#9f3d00]/30 transition-all font-medium"
                 />
-                <button
-                  type="button"
-                  id="voice-search-btn"
-                  onClick={handleVoiceSearch}
-                  className={`absolute right-3 flex items-center justify-center w-8 h-8 rounded-lg ${isListening ? 'bg-[#9f3d00] text-white animate-pulse' : 'bg-white text-[#9f3d00] hover:bg-[#9f3d00] hover:text-white'} transition-colors shadow-xs`}
-                  title="Voice Search"
-                >
-                  <span className="material-symbols-outlined text-[18px]">mic</span>
-                </button>
+                
+                <div className="absolute right-2 flex items-center gap-1">
+                  <button
+                    type="button"
+                    id="voice-search-btn"
+                    onClick={handleVoiceSearch}
+                    className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${isListening ? 'bg-[#9f3d00] text-white animate-pulse' : 'bg-white text-[#9f3d00] hover:bg-[#9f3d00] hover:text-white'} transition-colors shadow-2xs`}
+                    title="Voice Search"
+                  >
+                    <span className="material-symbols-outlined text-[16px] sm:text-[18px]">mic</span>
+                  </button>
+
+                  <button 
+                    type="submit"
+                    className="flex items-center justify-center px-2.5 py-1.5 rounded-lg bg-[#9f3d00] text-white hover:bg-[#c74e00] transition-colors text-xs font-bold shadow-2xs cursor-pointer"
+                  >
+                    Go
+                  </button>
+                </div>
               </div>
 
-              {/* Quick Filter Menus */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 shrink-0">
+              {/* Quick Filter Menus - Horizontally scrollable on mobile */}
+              <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar shrink-0">
                 
                 {/* Cuisine Filter */}
-                <div className="relative">
+                <div className="relative shrink-0">
                   <button
                     type="button"
                     onClick={() => setShowFiltersDropdown(showFiltersDropdown === 'cuisine' ? null : 'cuisine')}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-3 rounded-xl bg-[#f8ece5] text-[#201a17] text-xs font-semibold hover:bg-[#f2e6df] transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#f8ece5] text-[#201a17] text-xs font-semibold hover:bg-[#f2e6df] transition-colors whitespace-nowrap"
                   >
-                    <span className="material-symbols-outlined text-[18px] text-[#9f3d00]">restaurant_menu</span>
+                    <span className="material-symbols-outlined text-[16px] text-[#9f3d00]">restaurant_menu</span>
                     <span>{selectedCuisine || 'Cuisine'}</span>
-                    <span className="material-symbols-outlined text-[16px]">expand_more</span>
+                    <span className="material-symbols-outlined text-[14px]">expand_more</span>
                   </button>
                   {showFiltersDropdown === 'cuisine' && (
                     <div className="absolute top-full mt-2 left-0 w-44 bg-white rounded-xl shadow-xl border border-stone-200 p-2 z-30 flex flex-col gap-1">
@@ -794,15 +809,15 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                 </div>
 
                 {/* Cook Time Filter */}
-                <div className="relative">
+                <div className="relative shrink-0">
                   <button
                     type="button"
                     onClick={() => setShowFiltersDropdown(showFiltersDropdown === 'time' ? null : 'time')}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-3 rounded-xl bg-[#f8ece5] text-[#201a17] text-xs font-semibold hover:bg-[#f2e6df] transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#f8ece5] text-[#201a17] text-xs font-semibold hover:bg-[#f2e6df] transition-colors whitespace-nowrap"
                   >
-                    <span className="material-symbols-outlined text-[18px] text-[#8e4e14]">schedule</span>
+                    <span className="material-symbols-outlined text-[16px] text-[#8e4e14]">schedule</span>
                     <span>{selectedCookTime || 'Cook Time'}</span>
-                    <span className="material-symbols-outlined text-[16px]">expand_more</span>
+                    <span className="material-symbols-outlined text-[14px]">expand_more</span>
                   </button>
                   {showFiltersDropdown === 'time' && (
                     <div className="absolute top-full mt-2 left-0 w-40 bg-white rounded-xl shadow-xl border border-stone-200 p-2 z-30 flex flex-col gap-1">
@@ -824,15 +839,15 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                 </div>
 
                 {/* Dietary Filter */}
-                <div className="relative">
+                <div className="relative shrink-0">
                   <button
                     type="button"
                     onClick={() => setShowFiltersDropdown(showFiltersDropdown === 'dietary' ? null : 'dietary')}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-3 rounded-xl bg-[#f8ece5] text-[#201a17] text-xs font-semibold hover:bg-[#f2e6df] transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#f8ece5] text-[#201a17] text-xs font-semibold hover:bg-[#f2e6df] transition-colors whitespace-nowrap"
                   >
-                    <span className="material-symbols-outlined text-[18px] text-[#00685d]">eco</span>
+                    <span className="material-symbols-outlined text-[16px] text-[#00685d]">eco</span>
                     <span>{selectedDietary || 'Dietary'}</span>
-                    <span className="material-symbols-outlined text-[16px]">expand_more</span>
+                    <span className="material-symbols-outlined text-[14px]">expand_more</span>
                   </button>
                   {showFiltersDropdown === 'dietary' && (
                     <div className="absolute top-full mt-2 left-0 w-40 bg-white rounded-xl shadow-xl border border-stone-200 p-2 z-30 flex flex-col gap-1">
@@ -855,9 +870,10 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
 
                 <button 
                   type="submit"
-                  className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#9f3d00] text-white hover:bg-[#c74e00] transition-colors shadow-xs cursor-pointer"
+                  className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#9f3d00] text-white hover:bg-[#c74e00] transition-colors text-xs font-bold shadow-xs cursor-pointer shrink-0 ml-auto"
                 >
-                  <span className="material-symbols-outlined text-[20px]">tune</span>
+                  <span className="material-symbols-outlined text-[16px]">tune</span>
+                  <span className="hidden sm:inline">Apply</span>
                 </button>
               </div>
             </form>
@@ -872,7 +888,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                   key={tag}
                   type="button"
                   onClick={() => handleTagClick(tag)}
-                  className="px-3 py-1 rounded-full bg-[#f8ece5] hover:bg-[#ffdbcd] hover:text-[#9f3d00] text-xs text-[#594137] font-medium transition-colors shrink-0 cursor-pointer"
+                  className="px-2.5 sm:px-3 py-1 rounded-full bg-[#f8ece5] hover:bg-[#ffdbcd] hover:text-[#9f3d00] text-xs text-[#594137] font-medium transition-colors shrink-0 cursor-pointer"
                 >
                   {tag}
                 </button>
@@ -883,33 +899,33 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
         </section>
 
         {/* 3. PICKED FOR YOU (Personalized) */}
-        <section className="mt-14">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-2">
+        <section className="mt-10 sm:mt-14">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 sm:mb-6 gap-2">
             <div>
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#9f3d00] text-[24px]">recommend</span>
-                <h2 className="font-serif text-2xl sm:text-3xl text-[#201a17] font-bold tracking-tight">Picked For You</h2>
+                <span className="material-symbols-outlined text-[#9f3d00] text-[22px] sm:text-[24px]">recommend</span>
+                <h2 className="font-serif text-xl sm:text-3xl text-[#201a17] font-bold tracking-tight">Picked For You</h2>
               </div>
-              <p className="text-sm text-[#594137] mt-0.5">Based on your cooking preferences, pantry frequency & local taste notes.</p>
+              <p className="text-xs sm:text-sm text-[#594137] mt-0.5">Based on your cooking preferences, pantry frequency & local taste notes.</p>
             </div>
             
             <button
               onClick={() => onNavigate('explore')}
-              className="inline-flex items-center gap-1 text-sm font-semibold text-[#9f3d00] hover:underline group cursor-pointer"
+              className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-[#9f3d00] hover:underline group cursor-pointer self-start sm:self-auto"
             >
               <span>View all recommendations</span>
-              <span className="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1">chevron_right</span>
+              <span className="material-symbols-outlined text-[16px] sm:text-[18px] transition-transform group-hover:translate-x-1">chevron_right</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {pickedDishes.map((dish) => {
               const isSaved = savedRecipeIds.has(dish.id);
               return (
                 <article
                   key={dish.id}
                   onClick={() => onSelectRecipe(dish as any)}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col hover:-translate-y-1 border border-[#e1bfb2]/30 cursor-pointer"
+                  className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col hover:-translate-y-1 border border-[#e1bfb2]/30 cursor-pointer active:scale-98"
                 >
                   <div className="relative aspect-4/3 w-full overflow-hidden bg-[#f8ece5]">
                     <img
@@ -922,11 +938,11 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                     {/* Bookmark toggle */}
                     <button
                       onClick={(e) => onToggleSave(dish.id, e)}
-                      className={`absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center ${isSaved ? 'text-[#9f3d00]' : 'text-[#201a17] hover:text-[#9f3d00]'} shadow-xs transition-colors`}
+                      className={`absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center ${isSaved ? 'text-[#9f3d00]' : 'text-[#201a17] hover:text-[#9f3d00]'} shadow-xs transition-colors`}
                       title="Save Recipe"
                     >
                       <span 
-                        className="material-symbols-outlined text-[20px]" 
+                        className="material-symbols-outlined text-[18px] sm:text-[20px]" 
                         style={{ fontVariationSettings: isSaved ? "'FILL' 1" : "'FILL' 0" }}
                       >
                         bookmark
@@ -934,39 +950,39 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                     </button>
 
                     {/* Rating badge */}
-                    <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-md shadow-xs">
-                      <span className="material-symbols-outlined text-[15px] text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                    <div className="absolute bottom-2.5 left-2.5 sm:bottom-3 sm:left-3 flex items-center gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-white/95 backdrop-blur-md shadow-xs">
+                      <span className="material-symbols-outlined text-[14px] sm:text-[15px] text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                       <span className="text-xs font-bold text-[#201a17]">{dish.rating}</span>
                       <span className="text-[10px] text-[#594137]">({dish.reviewCount})</span>
                     </div>
 
                     {/* Top tag badge */}
-                    <span className={`absolute top-3 left-3 ${dish.badgeColor} text-[11px] font-semibold px-2.5 py-0.5 rounded-md shadow-xs`}>
+                    <span className={`absolute top-2.5 left-2.5 sm:top-3 sm:left-3 ${dish.badgeColor} text-[10px] sm:text-[11px] font-semibold px-2 sm:px-2.5 py-0.5 rounded-md shadow-xs`}>
                       {dish.badge}
                     </span>
                   </div>
 
-                  <div className="p-4 flex flex-col flex-1 justify-between gap-3">
+                  <div className="p-3.5 sm:p-4 flex flex-col flex-1 justify-between gap-2.5 sm:gap-3">
                     <div>
-                      <div className="flex items-center justify-between text-xs text-[#594137] mb-1.5">
-                        <span className="text-[11px] uppercase tracking-wider font-semibold text-[#8e4e14]">{dish.cuisine}</span>
-                        <span className="inline-flex items-center gap-1 text-[11px]">
-                          <span className="material-symbols-outlined text-[14px]">schedule</span>
+                      <div className="flex items-center justify-between text-xs text-[#594137] mb-1">
+                        <span className="text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold text-[#8e4e14]">{dish.cuisine}</span>
+                        <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px]">
+                          <span className="material-symbols-outlined text-[13px] sm:text-[14px]">schedule</span>
                           {dish.cookTimeMinutes + dish.prepTimeMinutes} min
                         </span>
                       </div>
 
-                      <h3 className="font-serif text-base font-bold text-[#201a17] group-hover:text-[#9f3d00] transition-colors line-clamp-2 leading-snug">
+                      <h3 className="font-serif text-sm sm:text-base font-bold text-[#201a17] group-hover:text-[#9f3d00] transition-colors line-clamp-2 leading-snug">
                         {dish.title}
                       </h3>
                     </div>
 
                     <div className="pt-2 flex items-center justify-between border-t border-[#f8ece5]">
                       <div className="flex items-center gap-2">
-                        <div className={`w-7 h-7 rounded-full ${dish.author.avatarBg} flex items-center justify-center font-bold text-xs`}>
+                        <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full ${dish.author.avatarBg} flex items-center justify-center font-bold text-xs`}>
                           {dish.author.initials}
                         </div>
-                        <span className="text-xs text-[#201a17] font-semibold truncate max-w-[100px]">{dish.author.name}</span>
+                        <span className="text-xs text-[#201a17] font-semibold truncate max-w-[90px] sm:max-w-[100px]">{dish.author.name}</span>
                       </div>
                       <span className="px-2 py-0.5 rounded-full bg-[#f8ece5] text-[#594137] text-[10px] font-semibold">
                         {dish.difficulty}
@@ -980,44 +996,44 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
         </section>
 
         {/* 4. "NOT SURE WHAT TO COOK? — AI KITCHEN" FEATURE SHOWCASE */}
-        <section className="mt-16">
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#9f3d00] via-[#c74e00] to-[#8e4e14] p-6 sm:p-8 lg:p-10 text-white shadow-xl">
+        <section className="mt-10 sm:mt-16">
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#9f3d00] via-[#c74e00] to-[#8e4e14] p-4 sm:p-8 lg:p-10 text-white shadow-xl">
             
             {/* Ambient Sparkle Pattern Visual */}
             <div className="absolute -top-10 -right-10 w-80 h-80 rounded-full bg-[#ffab69]/20 blur-2xl pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full bg-[#8cf5e4]/15 blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
               
-              <div className="lg:col-span-7 flex flex-col gap-3.5">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md w-fit">
-                  <span className="material-symbols-outlined text-[#ffdcc4] text-[18px]">auto_awesome</span>
-                  <span className="text-[11px] text-white font-semibold uppercase tracking-wider">
+              <div className="lg:col-span-7 flex flex-col gap-3">
+                <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-white/15 backdrop-blur-md w-fit">
+                  <span className="material-symbols-outlined text-[#ffdcc4] text-[16px] sm:text-[18px]">auto_awesome</span>
+                  <span className="text-[10px] sm:text-[11px] text-white font-semibold uppercase tracking-wider">
                     Gemini 2.5 Flash Culinary Engine
                   </span>
                 </div>
 
-                <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight font-bold leading-tight">
+                <h2 className="font-serif text-2xl sm:text-4xl lg:text-5xl text-white tracking-tight font-bold leading-tight">
                   Not Sure What to Cook?
                 </h2>
 
-                <p className="text-sm sm:text-base text-white/90 max-w-xl leading-relaxed">
+                <p className="text-xs sm:text-base text-white/90 max-w-xl leading-relaxed">
                   Tell AI what ingredients you have in your fridge and get a personalized gourmet recipe in seconds — tailored to your dietary goals and cooking time.
                 </p>
 
                 {/* Interactive Fridge Prompt Showcase */}
-                <div className="mt-2 bg-white/95 backdrop-blur-md rounded-2xl p-4 text-[#201a17] shadow-md border border-white/40">
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#9f3d00]">
-                      <span className="material-symbols-outlined text-[18px]">kitchen</span>
+                <div className="mt-1 sm:mt-2 bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-4 text-[#201a17] shadow-md border border-white/40">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#9f3d00]">
+                      <span className="material-symbols-outlined text-[16px]">kitchen</span>
                       <span>Pantry Match Simulation</span>
                     </div>
-                    <span className="text-[10px] text-stone-500 font-medium">Click tags to remove or add</span>
+                    <span className="text-[10px] text-stone-500 font-medium">Tap to edit</span>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 p-2.5 bg-[#fef1ea] rounded-xl">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 p-2 sm:p-2.5 bg-[#fef1ea] rounded-xl">
                     {fridgeChips.map((chip, idx) => (
-                      <span key={idx} className="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg text-xs font-semibold text-[#201a17] shadow-xs border border-stone-200">
+                      <span key={idx} className="inline-flex items-center gap-1 bg-white px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-xs font-semibold text-[#201a17] shadow-xs border border-stone-200">
                         {chip}
                         <button 
                           onClick={() => handleRemoveFridgeChip(idx)}
@@ -1037,26 +1053,26 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                         onKeyDown={handleAddFridgeChip}
                         onBlur={() => setShowAddChip(false)}
                         autoFocus
-                        className="text-xs px-2.5 py-1 rounded-lg bg-white border border-[#9f3d00] outline-none text-stone-900"
+                        className="text-xs px-2 py-0.5 rounded-lg bg-white border border-[#9f3d00] outline-none text-stone-900"
                       />
                     ) : (
                       <button 
                         onClick={() => setShowAddChip(true)}
                         className="text-xs text-[#9f3d00] hover:text-[#783d01] italic pl-1 cursor-pointer font-medium"
                       >
-                        + add parmesan or olive oil...
+                        + add item...
                       </button>
                     )}
                   </div>
 
                   {/* Quick prompt ideas */}
-                  <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] text-[#594137] font-semibold mr-1">Ask AI:</span>
+                  <div className="mt-2.5 flex flex-wrap items-center gap-1 sm:gap-1.5">
+                    <span className="text-[10px] sm:text-[11px] text-[#594137] font-semibold mr-0.5">Ask AI:</span>
                     {[
-                      "What can I make in 15 minutes?",
-                      "Make this recipe healthier",
-                      "Substitute for heavy cream?",
-                      "Suggest high-protein dinner"
+                      "15-minute quick meal",
+                      "Make it healthier",
+                      "Heavy cream substitute",
+                      "High-protein dinner"
                     ].map((promptText) => (
                       <button
                         key={promptText}
@@ -1068,7 +1084,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                             onNavigate('ai-kitchen');
                           }
                         }}
-                        className="px-2.5 py-1 rounded-full bg-[#f8ece5] text-xs hover:bg-[#ffdbcd] hover:text-[#9f3d00] transition-colors text-[#201a17] font-medium cursor-pointer"
+                        className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-[#f8ece5] text-[11px] sm:text-xs hover:bg-[#ffdbcd] hover:text-[#9f3d00] transition-colors text-[#201a17] font-medium cursor-pointer"
                       >
                         "{promptText}"
                       </button>
@@ -1076,30 +1092,30 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                   </div>
                 </div>
 
-                <div className="pt-2 flex flex-wrap items-center gap-3">
+                <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                   <button
                     id="open-ai-kitchen-btn"
                     onClick={() => onNavigate('ai-kitchen')}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#9f3d00] font-bold text-base rounded-xl shadow-lg hover:shadow-2xl transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 bg-white text-[#9f3d00] font-bold text-sm sm:text-base rounded-xl shadow-lg hover:shadow-2xl transition-all duration-200 hover:-translate-y-0.5 cursor-pointer active:scale-95"
                   >
-                    <span className="material-symbols-outlined text-[20px] text-[#9f3d00]">auto_awesome</span>
+                    <span className="material-symbols-outlined text-[18px] sm:text-[20px] text-[#9f3d00]">auto_awesome</span>
                     <span>Open AI Kitchen ✨</span>
                   </button>
-                  <span className="text-xs text-white/85 font-medium">Zero tokens required • Unlimited creations</span>
+                  <span className="text-[11px] sm:text-xs text-white/85 font-medium text-center sm:text-left">Zero tokens required • Unlimited creations</span>
                 </div>
 
               </div>
 
               {/* Decorative AI Cooking Transformation Visual */}
-              <div className="lg:col-span-5 relative flex justify-center">
+              <div className="lg:col-span-5 relative flex justify-center mt-2 lg:mt-0">
                 <div 
                   onClick={() => onSelectRecipe(aiCapreseChicken)}
-                  className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl bg-white text-[#201a17] p-4 flex flex-col gap-3 cursor-pointer hover:scale-[1.02] transition-transform"
+                  className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl bg-white text-[#201a17] p-3.5 sm:p-4 flex flex-col gap-2.5 sm:gap-3 cursor-pointer hover:scale-[1.02] transition-transform"
                 >
                   <div className="flex items-center justify-between pb-1">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-[#ffab69] flex items-center justify-center text-[#2f1400]">
-                        <span className="material-symbols-outlined text-[18px]">smart_toy</span>
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#ffab69] flex items-center justify-center text-[#2f1400]">
+                        <span className="material-symbols-outlined text-[16px] sm:text-[18px]">smart_toy</span>
                       </div>
                       <div>
                         <p className="text-xs font-bold text-[#201a17]">Chef Gemini Assistant</p>
@@ -1131,14 +1147,14 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                   </div>
 
                   <div className="flex items-center justify-between pt-1 text-xs text-[#594137] border-t border-[#f8ece5]">
-                    <div className="flex items-center gap-2 text-[11px] font-medium">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] font-medium">
                       <span>⚡ 390 kcal</span>
                       <span>•</span>
                       <span>⏱ 15m</span>
                       <span>•</span>
-                      <span className="text-[#00685d] font-semibold">🌱 Gluten-Free</span>
+                      <span className="text-[#00685d] font-semibold">🌱 GF</span>
                     </div>
-                    <span className="material-symbols-outlined text-[#9f3d00] text-[20px]">chevron_right</span>
+                    <span className="material-symbols-outlined text-[#9f3d00] text-[18px] sm:text-[20px]">chevron_right</span>
                   </div>
                 </div>
               </div>
@@ -1149,44 +1165,44 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
         </section>
 
         {/* 5. TRENDING RECIPES CAROUSEL / HIGHLIGHTS */}
-        <section className="mt-16">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-2">
+        <section className="mt-10 sm:mt-16">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 sm:mb-6 gap-2">
             <div>
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#9f3d00] text-[24px]">local_fire_department</span>
-                <h2 className="font-serif text-2xl sm:text-3xl text-[#201a17] font-bold tracking-tight">Trending Recipes</h2>
+                <span className="material-symbols-outlined text-[#9f3d00] text-[22px] sm:text-[24px]">local_fire_department</span>
+                <h2 className="font-serif text-xl sm:text-3xl text-[#201a17] font-bold tracking-tight">Trending Recipes</h2>
               </div>
-              <p className="text-sm text-[#594137] mt-0.5">Updated hourly from the vibrant home cook community.</p>
+              <p className="text-xs sm:text-sm text-[#594137] mt-0.5">Updated hourly from the vibrant home cook community.</p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 self-end sm:self-auto">
               <button
                 aria-label="Previous trending recipe"
                 onClick={() => setActiveTrendingIndex(prev => (prev === 0 ? trendingDishes.length - 1 : prev - 1))}
-                className="w-10 h-10 rounded-full bg-[#f8ece5] hover:bg-[#f2e6df] flex items-center justify-center text-[#201a17] transition-colors cursor-pointer"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#f8ece5] hover:bg-[#f2e6df] flex items-center justify-center text-[#201a17] transition-colors cursor-pointer active:scale-95"
                 id="trend-prev"
               >
-                <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+                <span className="material-symbols-outlined text-[18px] sm:text-[20px]">arrow_back</span>
               </button>
               <button
                 aria-label="Next trending recipe"
                 onClick={() => setActiveTrendingIndex(prev => (prev === trendingDishes.length - 1 ? 0 : prev + 1))}
-                className="w-10 h-10 rounded-full bg-[#f8ece5] hover:bg-[#f2e6df] flex items-center justify-center text-[#201a17] transition-colors cursor-pointer"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#f8ece5] hover:bg-[#f2e6df] flex items-center justify-center text-[#201a17] transition-colors cursor-pointer active:scale-95"
                 id="trend-next"
               >
-                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                <span className="material-symbols-outlined text-[18px] sm:text-[20px]">arrow_forward</span>
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {trendingDishes.map((trend) => {
               const isSaved = savedRecipeIds.has(trend.id);
               return (
                 <article
                   key={trend.id}
                   onClick={() => onSelectRecipe(trend.recipeObj as any)}
-                  className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col group hover:-translate-y-1 border border-[#e1bfb2]/30 cursor-pointer"
+                  className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col group hover:-translate-y-1 border border-[#e1bfb2]/30 cursor-pointer active:scale-98"
                 >
                   <div className="relative aspect-16/11 w-full overflow-hidden bg-[#f8ece5]">
                     <img
@@ -1196,53 +1212,53 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                       referrerPolicy="no-referrer"
                     />
                     
-                    <span className="absolute top-3 left-3 bg-[#9f3d00] text-white text-xs font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                    <span className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 bg-[#9f3d00] text-white text-[10px] sm:text-xs font-bold px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-md flex items-center gap-1">
                       <span>{trend.rank}</span>
                     </span>
 
                     <button
                       onClick={(e) => onToggleSave(trend.id, e)}
-                      className={`absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center ${isSaved ? 'text-[#9f3d00]' : 'text-[#201a17] hover:text-[#9f3d00]'} shadow-xs transition-colors`}
+                      className={`absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center ${isSaved ? 'text-[#9f3d00]' : 'text-[#201a17] hover:text-[#9f3d00]'} shadow-xs transition-colors`}
                       title="Save Recipe"
                     >
-                      <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: isSaved ? "'FILL' 1" : "'FILL' 0" }}>
+                      <span className="material-symbols-outlined text-[18px] sm:text-[20px]" style={{ fontVariationSettings: isSaved ? "'FILL' 1" : "'FILL' 0" }}>
                         bookmark
                       </span>
                     </button>
 
-                    <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-md shadow-xs">
-                      <span className="material-symbols-outlined text-[15px] text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                    <div className="absolute bottom-2.5 left-2.5 sm:bottom-3 sm:left-3 flex items-center gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-white/95 backdrop-blur-md shadow-xs">
+                      <span className="material-symbols-outlined text-[14px] sm:text-[15px] text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                       <span className="text-xs font-bold text-[#201a17]">{trend.rating}</span>
                       <span className="text-[10px] text-[#594137]">({trend.saves})</span>
                     </div>
                   </div>
 
-                  <div className="p-5 flex flex-col gap-2 flex-1 justify-between">
+                  <div className="p-4 sm:p-5 flex flex-col gap-2 flex-1 justify-between">
                     <div>
                       <div className="flex items-center gap-2 text-xs text-[#594137] mb-1">
-                        <span className={`text-[11px] font-bold uppercase tracking-wider ${trend.tagColor}`}>{trend.tag}</span>
+                        <span className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider ${trend.tagColor}`}>{trend.tag}</span>
                         <span>•</span>
-                        <span className="inline-flex items-center gap-1 text-[11px] font-medium">
-                          <span className="material-symbols-outlined text-[14px]">schedule</span> {trend.time}
+                        <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-medium">
+                          <span className="material-symbols-outlined text-[13px] sm:text-[14px]">schedule</span> {trend.time}
                         </span>
                       </div>
 
-                      <h3 className="font-serif text-base font-bold text-[#201a17] group-hover:text-[#9f3d00] transition-colors leading-snug">
+                      <h3 className="font-serif text-sm sm:text-base font-bold text-[#201a17] group-hover:text-[#9f3d00] transition-colors leading-snug">
                         {trend.title}
                       </h3>
 
-                      <p className="text-xs text-[#594137] line-clamp-2 mt-1.5 leading-relaxed">
+                      <p className="text-xs text-[#594137] line-clamp-2 mt-1 leading-relaxed">
                         {trend.desc}
                       </p>
                     </div>
 
-                    <div className="pt-3 flex items-center justify-between text-xs text-[#594137] border-t border-[#f8ece5]">
-                      <span className="font-semibold text-[#201a17]">{trend.chef}</span>
+                    <div className="pt-2.5 sm:pt-3 flex items-center justify-between text-xs text-[#594137] border-t border-[#f8ece5]">
+                      <span className="font-semibold text-[#201a17] truncate max-w-[120px]">{trend.chef}</span>
                       <button
                         onClick={(e) => onStartCooking(trend.recipeObj as any, e)}
                         className="inline-flex items-center gap-1 text-[#9f3d00] font-bold hover:underline cursor-pointer"
                       >
-                        Cook this <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        Cook this <span className="material-symbols-outlined text-[15px] sm:text-[16px]">arrow_forward</span>
                       </button>
                     </div>
                   </div>
@@ -1253,81 +1269,81 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
         </section>
 
         {/* 6. EXPLORE BY CATEGORY */}
-        <section className="mt-16">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-2">
+        <section className="mt-10 sm:mt-16">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 sm:mb-6 gap-2">
             <div>
-              <h2 className="font-serif text-2xl sm:text-3xl text-[#201a17] font-bold tracking-tight">
+              <h2 className="font-serif text-xl sm:text-3xl text-[#201a17] font-bold tracking-tight">
                 Explore by Category & Cuisine
               </h2>
-              <p className="text-sm text-[#594137] mt-0.5">Find inspiration across curated meal types and world food cultures.</p>
+              <p className="text-xs sm:text-sm text-[#594137] mt-0.5">Find inspiration across curated meal types and world food cultures.</p>
             </div>
             <span className="text-xs text-[#594137] font-semibold">13 Curation Hubs</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3.5">
             {categories.map((cat) => (
               <button
                 key={cat.name}
                 onClick={() => handleCategoryClick(cat.name)}
-                className="group bg-white hover:bg-[#fef1ea] p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col items-center text-center gap-2 hover:-translate-y-0.5 border border-[#e1bfb2]/30 cursor-pointer"
+                className="group bg-white hover:bg-[#fef1ea] p-3 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col items-center text-center gap-1.5 sm:gap-2 hover:-translate-y-0.5 border border-[#e1bfb2]/30 cursor-pointer active:scale-95"
               >
-                <div className={`w-14 h-14 rounded-2xl ${cat.bg} flex items-center justify-center ${cat.text} group-hover:scale-110 transition-transform shadow-xs`}>
-                  <span className="material-symbols-outlined text-[28px]">{cat.icon}</span>
+                <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-2xl ${cat.bg} flex items-center justify-center ${cat.text} group-hover:scale-110 transition-transform shadow-xs`}>
+                  <span className="material-symbols-outlined text-[22px] sm:text-[28px]">{cat.icon}</span>
                 </div>
-                <span className="text-sm font-bold text-[#201a17]">{cat.name}</span>
-                <span className="text-[11px] text-[#594137]">{cat.count}</span>
+                <span className="text-xs sm:text-sm font-bold text-[#201a17] truncate max-w-full">{cat.name}</span>
+                <span className="text-[10px] sm:text-[11px] text-[#594137] truncate max-w-full">{cat.count}</span>
               </button>
             ))}
           </div>
         </section>
 
         {/* 7. COMMUNITY & LOCAL STATS STRIP */}
-        <section className="mt-16">
-          <div className="rounded-2xl bg-[#fef1ea] p-6 lg:p-8 shadow-xs border border-[#e1bfb2]/40">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center text-center md:text-left">
+        <section className="mt-10 sm:mt-16">
+          <div className="rounded-2xl bg-[#fef1ea] p-4 sm:p-6 lg:p-8 shadow-xs border border-[#e1bfb2]/40">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 items-center text-center sm:text-left">
               
               {/* Stat 1 */}
               <div 
                 onClick={() => onNavigate('explore')}
-                className="flex items-center gap-3.5 justify-center md:justify-start p-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer group"
+                className="flex items-center gap-3 justify-center sm:justify-start p-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer group active:scale-98"
                 title="Explore 12,000+ Recipes"
               >
-                <div className="w-12 h-12 rounded-xl bg-white text-[#9f3d00] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30 group-hover:scale-105 transition-transform">
-                  <span className="material-symbols-outlined text-[26px]">groups</span>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white text-[#9f3d00] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30 group-hover:scale-105 transition-transform">
+                  <span className="material-symbols-outlined text-[22px] sm:text-[26px]">groups</span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-serif text-lg text-[#201a17] font-bold group-hover:text-[#9f3d00] transition-colors">12,000+ Recipes</span>
-                  <span className="text-xs text-[#594137]">Community tested & verified by home cooks</span>
+                <div className="flex flex-col text-left">
+                  <span className="font-serif text-base sm:text-lg text-[#201a17] font-bold group-hover:text-[#9f3d00] transition-colors">12,000+ Recipes</span>
+                  <span className="text-[11px] sm:text-xs text-[#594137]">Community tested & verified</span>
                 </div>
               </div>
 
               {/* Stat 2 */}
               <div 
                 onClick={() => onNavigate('settings')}
-                className="flex items-center gap-3.5 justify-center md:justify-start p-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer group"
+                className="flex items-center gap-3 justify-center sm:justify-start p-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer group active:scale-98"
                 title="View Privacy & Local Storage Settings"
               >
-                <div className="w-12 h-12 rounded-xl bg-white text-[#00685d] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30 group-hover:scale-105 transition-transform">
-                  <span className="material-symbols-outlined text-[26px]">lock</span>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white text-[#00685d] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30 group-hover:scale-105 transition-transform">
+                  <span className="material-symbols-outlined text-[22px] sm:text-[26px]">lock</span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-serif text-lg text-[#201a17] font-bold group-hover:text-[#00685d] transition-colors">100% Private</span>
-                  <span className="text-xs text-[#594137]">Stored directly in your browser's local memory</span>
+                <div className="flex flex-col text-left">
+                  <span className="font-serif text-base sm:text-lg text-[#201a17] font-bold group-hover:text-[#00685d] transition-colors">100% Private</span>
+                  <span className="text-[11px] sm:text-xs text-[#594137]">Stored in local browser storage</span>
                 </div>
               </div>
 
               {/* Stat 3 */}
               <div 
                 onClick={() => onNavigate('ai-kitchen')}
-                className="flex items-center gap-3.5 justify-center md:justify-start p-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer group"
+                className="flex items-center gap-3 justify-center sm:justify-start p-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer group active:scale-98"
                 title="Launch Gemini AI Kitchen"
               >
-                <div className="w-12 h-12 rounded-xl bg-white text-[#8e4e14] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30 group-hover:scale-105 transition-transform">
-                  <span className="material-symbols-outlined text-[26px]">cognition</span>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white text-[#8e4e14] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30 group-hover:scale-105 transition-transform">
+                  <span className="material-symbols-outlined text-[22px] sm:text-[26px]">cognition</span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-serif text-lg text-[#201a17] font-bold group-hover:text-[#8e4e14] transition-colors">Gemini AI Inside</span>
-                  <span className="text-xs text-[#594137]">Smart ingredient substitutes & recipe scalers</span>
+                <div className="flex flex-col text-left">
+                  <span className="font-serif text-base sm:text-lg text-[#201a17] font-bold group-hover:text-[#8e4e14] transition-colors">Gemini AI Inside</span>
+                  <span className="text-[11px] sm:text-xs text-[#594137]">Smart substitutions & scaling</span>
                 </div>
               </div>
 
