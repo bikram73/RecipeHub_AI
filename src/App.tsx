@@ -30,7 +30,9 @@ import { AddToCollectionModal } from './components/AddToCollectionModal';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
 import { CreatorProfileModal } from './components/CreatorProfileModal';
 import { OnboardingModal } from './components/OnboardingModal';
+import { ShareRecipeModal } from './components/ShareRecipeModal';
 import { getStoredRecipes, saveStoredRecipes, logActivity, getProfile, isOnboarded } from './utils/storage';
+import { getSharedRecipeFromUrl } from './services/share';
 
 export default function App() {
   // Navigation State
@@ -57,6 +59,7 @@ export default function App() {
   const [selectedRecipeForDetail, setSelectedRecipeForDetail] = useState<Recipe | null>(null);
   const [activeCookingRecipe, setActiveCookingRecipe] = useState<Recipe | null>(null);
   const [recipeForCollection, setRecipeForCollection] = useState<Recipe | null>(null);
+  const [shareRecipeTarget, setShareRecipeTarget] = useState<Recipe | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
   const [aiInitialSubTab, setAiInitialSubTab] = useState<'generator' | 'assistant' | 'substitute' | 'improve'>('generator');
@@ -68,10 +71,42 @@ export default function App() {
     setActiveTab('ai-kitchen');
   };
 
+  const handleOpenShare = (recipe: Recipe, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setShareRecipeTarget(recipe);
+  };
+
   // Core Data States
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
     return getStoredRecipes(INITIAL_RECIPES);
   });
+
+  // Handle shared recipe links on initial application mount
+  useEffect(() => {
+    const { recipeId, sharedRecipe } = getSharedRecipeFromUrl();
+    if (sharedRecipe) {
+      setRecipes((prev) => {
+        const exists = prev.some((r) => r.id === sharedRecipe.id);
+        if (!exists) {
+          return [sharedRecipe, ...prev];
+        }
+        return prev;
+      });
+      setSelectedRecipeForDetail(sharedRecipe);
+      logActivity({
+        type: 'saved_recipe',
+        title: 'Opened Shared Recipe',
+        description: `Viewed "${sharedRecipe.title}"`,
+        recipeId: sharedRecipe.id,
+        recipeTitle: sharedRecipe.title,
+      });
+    } else if (recipeId) {
+      const found = recipes.find((r) => r.id === recipeId);
+      if (found) {
+        setSelectedRecipeForDetail(found);
+      }
+    }
+  }, []);
 
   const [pantryItems, setPantryItems] = useState<PantryItem[]>(() => {
     const saved = localStorage.getItem('recipehub_pantry');
@@ -597,6 +632,7 @@ export default function App() {
           onStartCooking={(r) => handleStartCooking(r)}
           onAddIngredientsToGrocery={handleAddIngredientsToGrocery}
           onOpenAddToCollection={(r) => setRecipeForCollection(r)}
+          onOpenShare={(r) => handleOpenShare(r)}
           onEditRecipe={(r) => {
             setRecipeToEdit(r);
             setIsCreateEditModalOpen(true);
@@ -607,6 +643,15 @@ export default function App() {
           onNavigateToAi={() => {
             setActiveTab('ai-kitchen');
           }}
+        />
+      )}
+
+      {/* Share Recipe Modal */}
+      {shareRecipeTarget && (
+        <ShareRecipeModal
+          recipe={shareRecipeTarget}
+          isOpen={Boolean(shareRecipeTarget)}
+          onClose={() => setShareRecipeTarget(null)}
         />
       )}
 

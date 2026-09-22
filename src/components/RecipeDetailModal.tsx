@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { shareRecipe } from '../services/share';
 import { getProfile, logActivity, saveComments, getComments, saveRatings, getRatings } from '../utils/storage';
+import { ShareRecipeModal } from './ShareRecipeModal';
 
 interface RecipeDetailModalProps {
   recipe: Recipe | null;
@@ -33,6 +34,7 @@ interface RecipeDetailModalProps {
   onStartCooking: (recipe: Recipe) => void;
   onAddIngredientsToGrocery?: (ingredients: Ingredient[], recipeTitle: string) => void;
   onOpenAddToCollection?: (recipe: Recipe) => void;
+  onOpenShare?: (recipe: Recipe) => void;
   onEditRecipe?: (recipe: Recipe) => void;
   onDeleteRecipe?: (recipeId: string, recipeTitle: string) => void;
   onNavigateToAi?: (mode: string) => void;
@@ -45,6 +47,7 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
   onStartCooking,
   onAddIngredientsToGrocery,
   onOpenAddToCollection,
+  onOpenShare,
   onEditRecipe,
   onDeleteRecipe,
   onNavigateToAi,
@@ -57,6 +60,7 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
   const [servings, setServings] = useState<number>(recipe.servings || 4);
   const [checkedIngredients, setCheckedIngredients] = useState<Record<string, boolean>>({});
   const [copiedShareToast, setCopiedShareToast] = useState<boolean>(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
 
   // Ratings & Reviews
   const initialRatings = getRatings();
@@ -91,11 +95,11 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
     }));
   };
 
-  const handleShare = async () => {
-    const res = await shareRecipe(recipe);
-    if (res.copied) {
-      setCopiedShareToast(true);
-      setTimeout(() => setCopiedShareToast(false), 2500);
+  const handleShare = () => {
+    if (onOpenShare) {
+      onOpenShare(recipe);
+    } else {
+      setIsShareModalOpen(true);
     }
   };
 
@@ -605,6 +609,13 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Share Recipe Modal */}
+      <ShareRecipeModal
+        recipe={recipe}
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+      />
     </div>
   );
 };

@@ -12,9 +12,11 @@ import {
   VolumeX, 
   CheckCircle2, 
   ListOrdered,
-  ChefHat
+  ChefHat,
+  Share2
 } from 'lucide-react';
 import { logActivity } from '../utils/storage';
+import { ShareRecipeModal } from './ShareRecipeModal';
 
 interface CookingModeModalProps {
   recipe: Recipe | null;
@@ -31,6 +33,7 @@ export const CookingModeModal: React.FC<CookingModeModalProps> = ({
   const [showIngredientsDrawer, setShowIngredientsDrawer] = useState<boolean>(false);
   const [speechEnabled, setSpeechEnabled] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
 
   // Timer state for current step
   const [timerSecondsLeft, setTimerSecondsLeft] = useState<number>(0);
@@ -237,13 +240,23 @@ export const CookingModeModal: React.FC<CookingModeModalProps> = ({
               </p>
             </div>
 
-            <button
-              id="finish-cooking-btn"
-              onClick={onClose}
-              className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-sm shadow-lg shadow-amber-500/30 transition-all"
-            >
-              Done & Return to Recipe
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                id="cooking-share-recipe-btn"
+                onClick={() => setIsShareModalOpen(true)}
+                className="flex-1 py-3.5 rounded-xl bg-stone-900 hover:bg-stone-850 text-white font-bold text-sm border border-stone-850 flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <Share2 className="w-4 h-4 text-amber-400" />
+                <span>Share Recipe</span>
+              </button>
+              <button
+                id="finish-cooking-btn"
+                onClick={onClose}
+                className="flex-1 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-sm shadow-lg shadow-amber-500/30 transition-all cursor-pointer"
+              >
+                Done & Return
+              </button>
+            </div>
           </div>
         ) : (
           /* Step Instruction Card */
@@ -373,6 +386,13 @@ export const CookingModeModal: React.FC<CookingModeModalProps> = ({
           </div>
         </div>
       )}
+
+      {/* Share Recipe Modal */}
+      <ShareRecipeModal
+        recipe={recipe}
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+      />
     </div>
   );
 };
