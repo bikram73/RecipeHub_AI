@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ChefHat, Sparkles, ArrowRight, Check, Utensils, User, AtSign, BookOpen, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ChefHat, Sparkles, ArrowRight, Check, Utensils, User, AtSign, BookOpen, X, Camera, Upload, Link as LinkIcon, Image } from 'lucide-react';
 import { LocalProfile } from '../types';
 import { saveProfile, setOnboarded, logActivity } from '../utils/storage';
 
@@ -60,6 +60,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [isUsernameCustom, setIsUsernameCustom] = useState(Boolean(initialProfile?.username && initialProfile.username !== 'chef'));
   const [bio, setBio] = useState(initialProfile?.bio || '');
   const [selectedAvatar, setSelectedAvatar] = useState(initialProfile?.avatar || AVATAR_OPTIONS[0]);
+  const [customPhotoUrl, setCustomPhotoUrl] = useState('');
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [favoriteCuisines, setFavoriteCuisines] = useState<string[]>(
     initialProfile?.favoriteCuisines && initialProfile.favoriteCuisines.length > 0
       ? initialProfile.favoriteCuisines
@@ -70,6 +73,33 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     (initialProfile?.cookingLevel as any) || 'Intermediate'
   );
   const [error, setError] = useState<string | null>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Photo size must be under 5MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        if (result) {
+          setSelectedAvatar(result);
+          setError(null);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleApplyUrl = () => {
+    if (customPhotoUrl.trim()) {
+      setSelectedAvatar(customPhotoUrl.trim());
+      setShowUrlInput(false);
+      setCustomPhotoUrl('');
+    }
+  };
 
   useEffect(() => {
     if (initialProfile) {
@@ -202,37 +232,104 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 Welcome to RecipeHub AI! Please enter your name and cooking persona to personalize your recipes, AI suggestions, and culinary notebook.
               </p>
 
-              {/* Avatar Selector */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                  Choose Your Avatar
-                </label>
-                <div className="flex items-center gap-3">
-                  {AVATAR_OPTIONS.map((av, idx) => (
+              {/* Custom Image / Profile Photo Avatar Selector */}
+              <div className="p-3.5 bg-amber-50/50 rounded-2xl border border-amber-100/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Chef Profile Photo
+                  </label>
+                  <div className="flex items-center gap-2">
                     <button
-                      key={idx}
                       type="button"
-                      onClick={() => setSelectedAvatar(av)}
-                      className={`relative rounded-full transition-all cursor-pointer p-0.5 ${
-                        selectedAvatar === av
-                          ? 'ring-3 ring-[#9f3d00] scale-105 shadow-md'
-                          : 'opacity-70 hover:opacity-100'
-                      }`}
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-xs font-bold text-[#9f3d00] hover:underline flex items-center gap-1 cursor-pointer"
                     >
+                      <Upload className="w-3 h-3" />
+                      <span>Upload Photo</span>
+                    </button>
+                    <span className="text-gray-300">•</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowUrlInput(!showUrlInput)}
+                      className="text-xs font-semibold text-gray-500 hover:text-gray-900 flex items-center gap-1 cursor-pointer"
+                    >
+                      <LinkIcon className="w-3 h-3" />
+                      <span>URL</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3.5">
+                  {/* Current Selected Avatar Preview & Quick Camera trigger */}
+                  <div className="relative group shrink-0">
+                    <div className="w-13 h-13 rounded-2xl overflow-hidden ring-3 ring-[#9f3d00] shadow-md bg-white">
                       <img
-                        src={av}
-                        alt="Avatar Option"
-                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
+                        src={selectedAvatar}
+                        alt="Current Profile Photo"
+                        className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"
                       />
-                      {selectedAvatar === av && (
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#9f3d00] rounded-full flex items-center justify-center text-white text-[10px]">
-                          ✓
-                        </div>
-                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      title="Upload custom image"
+                      className="absolute -bottom-1 -right-1 p-1.5 bg-[#9f3d00] text-white rounded-lg shadow-sm hover:scale-110 transition-transform cursor-pointer"
+                    >
+                      <Camera className="w-3 h-3" />
                     </button>
-                  ))}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </div>
+
+                  {/* Preset Quick Picks */}
+                  <div className="flex-1 flex items-center gap-2 overflow-x-auto py-1">
+                    {AVATAR_OPTIONS.map((av, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setSelectedAvatar(av)}
+                        className={`relative rounded-xl overflow-hidden shrink-0 transition-all cursor-pointer p-0.5 ${
+                          selectedAvatar === av
+                            ? 'ring-2 ring-[#9f3d00] scale-105'
+                            : 'opacity-60 hover:opacity-100'
+                        }`}
+                      >
+                        <img
+                          src={av}
+                          alt="Avatar Option"
+                          className="w-9 h-9 rounded-lg object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Collapsible URL Input */}
+                {showUrlInput && (
+                  <div className="flex items-center gap-2 pt-1 animate-in fade-in duration-150">
+                    <input
+                      type="url"
+                      placeholder="Paste image URL (https://...)"
+                      value={customPhotoUrl}
+                      onChange={(e) => setCustomPhotoUrl(e.target.value)}
+                      className="flex-1 text-xs px-3 py-1.5 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-[#9f3d00]"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyUrl}
+                      className="px-2.5 py-1.5 bg-[#9f3d00] text-white text-xs font-bold rounded-lg cursor-pointer"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div>
