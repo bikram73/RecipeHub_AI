@@ -98,26 +98,34 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const filteredRecipes = useMemo(() => {
     return recipes
       .filter((recipe) => {
-        // Search query (matches title, description, cuisine, ingredients, tags, and creator name)
+        // Search query (matches title, description, cuisine, ingredients, tags, dietary, category, and creator name)
         if (searchQuery.trim()) {
-          const q = searchQuery.toLowerCase();
-          const matchesTitle = recipe.title.toLowerCase().includes(q);
-          const matchesDescription = recipe.description?.toLowerCase().includes(q) || false;
-          const matchesCuisine = recipe.cuisine.toLowerCase().includes(q);
-          const matchesTags = recipe.tags?.some((t) => t.toLowerCase().includes(q)) || false;
-          const matchesIngredients = recipe.ingredients?.some((i) =>
-            i.name.toLowerCase().includes(q)
-          ) || false;
-          const matchesCreator = recipe.author?.name?.toLowerCase().includes(q) || false;
+          const tokens = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+          const matchesAllTokens = tokens.every((token) => {
+            const matchesTitle = recipe.title.toLowerCase().includes(token);
+            const matchesDescription = recipe.description?.toLowerCase().includes(token) || false;
+            const matchesCuisine = recipe.cuisine.toLowerCase().includes(token);
+            const matchesTags = recipe.tags?.some((t) => t.toLowerCase().includes(token)) || false;
+            const matchesIngredients = recipe.ingredients?.some((i) =>
+              i.name.toLowerCase().includes(token)
+            ) || false;
+            const matchesDietary = recipe.dietary?.some((d) => d.toLowerCase().includes(token)) || false;
+            const matchesCategory = recipe.category?.toLowerCase().includes(token) || false;
+            const matchesCreator = recipe.author?.name?.toLowerCase().includes(token) || false;
 
-          if (
-            !matchesTitle && 
-            !matchesDescription && 
-            !matchesCuisine && 
-            !matchesTags && 
-            !matchesIngredients && 
-            !matchesCreator
-          ) {
+            return (
+              matchesTitle ||
+              matchesDescription ||
+              matchesCuisine ||
+              matchesTags ||
+              matchesIngredients ||
+              matchesDietary ||
+              matchesCategory ||
+              matchesCreator
+            );
+          });
+
+          if (!matchesAllTokens) {
             return false;
           }
         }

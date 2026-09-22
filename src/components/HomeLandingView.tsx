@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Recipe, Ingredient } from '../types';
 
 export const CHEF_GIRL_AVATAR = "https://lh3.googleusercontent.com/aida-public/AB6AXuBqFsPqlgKaJLcJMJE0hI4VdayHVGCKYRRtApWeU_lblTpqGORD2CyDIQbyMEb25h_6eDMxwDT9MVTWjit3yrJiTAzopWdAMNAF5QgCw6oj-RiXH4VAKlrWvvqoJ-CgQqy5qQNPAdi5S6m7SoeHhBRl5G1OqpBCs4ksRJcmnaFwIdB4-o3jb37Jn_TxesjE4EBcz-uGo2LAC2koQfSPG0gV_VQGiKu8NGmq5PeDu8jY7vmizIqspmroxg";
@@ -75,21 +75,40 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
   const [selectedCookTime, setSelectedCookTime] = useState<string | null>(null);
   const [selectedDietary, setSelectedDietary] = useState<string | null>(null);
   const [showFiltersDropdown, setShowFiltersDropdown] = useState<'cuisine' | 'time' | 'dietary' | null>(null);
+  const filterMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filterMenuRef.current && !filterMenuRef.current.contains(e.target as Node)) {
+        setShowFiltersDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    let query = searchInput.trim();
-    if (selectedCuisine && selectedCuisine !== 'All Cuisines') {
-      query = query ? `${query} ${selectedCuisine}` : selectedCuisine;
-    }
-    if (selectedDietary && selectedDietary !== 'All Diets') {
-      query = query ? `${query} ${selectedDietary}` : selectedDietary;
-    }
+    const queryParts: string[] = [];
+    if (searchInput.trim()) queryParts.push(searchInput.trim());
+    if (selectedCuisine && selectedCuisine !== 'All Cuisines') queryParts.push(selectedCuisine);
+    if (selectedDietary && selectedDietary !== 'All Diets') queryParts.push(selectedDietary);
     if (selectedCookTime && selectedCookTime !== 'Any Time') {
-      query = query ? `${query} ${selectedCookTime}` : selectedCookTime;
+      if (selectedCookTime === '< 15 mins') queryParts.push('15 min');
+      else if (selectedCookTime === '< 30 mins') queryParts.push('30 min');
+      else if (selectedCookTime === '< 45 mins') queryParts.push('45 min');
+      else if (selectedCookTime === 'Slow Cook') queryParts.push('slow cook');
     }
-    onSearch?.(query);
+    const fullQuery = queryParts.join(' ');
+    onSearch?.(fullQuery);
     onNavigate('explore');
+  };
+
+  const handleClearAllFilters = () => {
+    setSelectedCuisine(null);
+    setSelectedCookTime(null);
+    setSelectedDietary(null);
+    setShowFiltersDropdown(null);
   };
 
   const handleVoiceSearch = () => {
@@ -805,23 +824,41 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                 </div>
               </div>
 
-              {/* Quick Filter Menus - Horizontally scrollable on mobile */}
-              <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar shrink-0">
+              {/* Quick Filter Menus - Fully visible and unclipped */}
+              <div ref={filterMenuRef} className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-0.5 relative z-30">
                 
                 {/* Cuisine Filter */}
-                <div className="relative shrink-0">
+                <div className="relative">
                   <button
                     type="button"
                     onClick={() => setShowFiltersDropdown(showFiltersDropdown === 'cuisine' ? null : 'cuisine')}
-                    className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#f8ece5] text-[#201a17] text-xs font-semibold hover:bg-[#f2e6df] transition-colors whitespace-nowrap"
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer select-none ${
+                      selectedCuisine
+                        ? 'bg-[#ffdcc4] text-[#783d01] border border-[#9f3d00]/30 shadow-2xs font-bold'
+                        : 'bg-[#f8ece5] text-[#201a17] hover:bg-[#f2e6df]'
+                    }`}
                   >
                     <span className="material-symbols-outlined text-[16px] text-[#9f3d00]">restaurant_menu</span>
                     <span>{selectedCuisine || 'Cuisine'}</span>
-                    <span className="material-symbols-outlined text-[14px]">expand_more</span>
+                    {selectedCuisine ? (
+                      <span 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCuisine(null);
+                        }}
+                        className="material-symbols-outlined text-[14px] hover:text-[#9f3d00] ml-0.5 p-0.5 rounded-full hover:bg-black/5"
+                        title="Clear cuisine"
+                      >
+                        close
+                      </span>
+                    ) : (
+                      <span className="material-symbols-outlined text-[14px]">expand_more</span>
+                    )}
                   </button>
                   {showFiltersDropdown === 'cuisine' && (
-                    <div className="absolute top-full mt-2 left-0 w-44 bg-white rounded-xl shadow-xl border border-stone-200 p-2 z-30 flex flex-col gap-1">
-                      {['All Cuisines', 'Italian', 'Indian', 'French', 'Mexican', 'Asian Fusion'].map(c => (
+                    <div className="absolute top-full mt-1.5 left-0 w-48 bg-white rounded-xl shadow-2xl border border-[#e1bfb2]/60 p-1.5 z-50 flex flex-col gap-0.5 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-2 py-1 text-[10px] uppercase font-bold text-[#8d7165] tracking-wider border-b border-[#f8ece5]">Select Cuisine</div>
+                      {['All Cuisines', 'Italian', 'Indian', 'French', 'Mexican', 'Asian Fusion', 'Mediterranean'].map(c => (
                         <button
                           key={c}
                           type="button"
@@ -829,9 +866,16 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                             setSelectedCuisine(c === 'All Cuisines' ? null : c);
                             setShowFiltersDropdown(null);
                           }}
-                          className="text-left px-3 py-1.5 text-xs text-stone-700 hover:bg-[#fef1ea] hover:text-[#9f3d00] rounded-lg font-medium"
+                          className={`text-left px-2.5 py-1.5 text-xs rounded-lg font-medium transition-colors flex items-center justify-between cursor-pointer ${
+                            (selectedCuisine === c || (!selectedCuisine && c === 'All Cuisines'))
+                              ? 'bg-[#fef1ea] text-[#9f3d00] font-bold'
+                              : 'text-stone-700 hover:bg-[#fef1ea] hover:text-[#9f3d00]'
+                          }`}
                         >
-                          {c}
+                          <span>{c}</span>
+                          {(selectedCuisine === c || (!selectedCuisine && c === 'All Cuisines')) && (
+                            <span className="material-symbols-outlined text-[14px]">check</span>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -839,18 +883,36 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                 </div>
 
                 {/* Cook Time Filter */}
-                <div className="relative shrink-0">
+                <div className="relative">
                   <button
                     type="button"
                     onClick={() => setShowFiltersDropdown(showFiltersDropdown === 'time' ? null : 'time')}
-                    className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#f8ece5] text-[#201a17] text-xs font-semibold hover:bg-[#f2e6df] transition-colors whitespace-nowrap"
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer select-none ${
+                      selectedCookTime
+                        ? 'bg-[#ffdcc4] text-[#783d01] border border-[#9f3d00]/30 shadow-2xs font-bold'
+                        : 'bg-[#f8ece5] text-[#201a17] hover:bg-[#f2e6df]'
+                    }`}
                   >
                     <span className="material-symbols-outlined text-[16px] text-[#8e4e14]">schedule</span>
                     <span>{selectedCookTime || 'Cook Time'}</span>
-                    <span className="material-symbols-outlined text-[14px]">expand_more</span>
+                    {selectedCookTime ? (
+                      <span 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCookTime(null);
+                        }}
+                        className="material-symbols-outlined text-[14px] hover:text-[#9f3d00] ml-0.5 p-0.5 rounded-full hover:bg-black/5"
+                        title="Clear cook time"
+                      >
+                        close
+                      </span>
+                    ) : (
+                      <span className="material-symbols-outlined text-[14px]">expand_more</span>
+                    )}
                   </button>
                   {showFiltersDropdown === 'time' && (
-                    <div className="absolute top-full mt-2 left-0 w-40 bg-white rounded-xl shadow-xl border border-stone-200 p-2 z-30 flex flex-col gap-1">
+                    <div className="absolute top-full mt-1.5 left-0 w-44 bg-white rounded-xl shadow-2xl border border-[#e1bfb2]/60 p-1.5 z-50 flex flex-col gap-0.5 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-2 py-1 text-[10px] uppercase font-bold text-[#8d7165] tracking-wider border-b border-[#f8ece5]">Prep & Cook Time</div>
                       {['Any Time', '< 15 mins', '< 30 mins', '< 45 mins', 'Slow Cook'].map(t => (
                         <button
                           key={t}
@@ -859,9 +921,16 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                             setSelectedCookTime(t === 'Any Time' ? null : t);
                             setShowFiltersDropdown(null);
                           }}
-                          className="text-left px-3 py-1.5 text-xs text-stone-700 hover:bg-[#fef1ea] hover:text-[#9f3d00] rounded-lg font-medium"
+                          className={`text-left px-2.5 py-1.5 text-xs rounded-lg font-medium transition-colors flex items-center justify-between cursor-pointer ${
+                            (selectedCookTime === t || (!selectedCookTime && t === 'Any Time'))
+                              ? 'bg-[#fef1ea] text-[#9f3d00] font-bold'
+                              : 'text-stone-700 hover:bg-[#fef1ea] hover:text-[#9f3d00]'
+                          }`}
                         >
-                          {t}
+                          <span>{t}</span>
+                          {(selectedCookTime === t || (!selectedCookTime && t === 'Any Time')) && (
+                            <span className="material-symbols-outlined text-[14px]">check</span>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -869,19 +938,37 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                 </div>
 
                 {/* Dietary Filter */}
-                <div className="relative shrink-0">
+                <div className="relative">
                   <button
                     type="button"
                     onClick={() => setShowFiltersDropdown(showFiltersDropdown === 'dietary' ? null : 'dietary')}
-                    className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#f8ece5] text-[#201a17] text-xs font-semibold hover:bg-[#f2e6df] transition-colors whitespace-nowrap"
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer select-none ${
+                      selectedDietary
+                        ? 'bg-[#ffdcc4] text-[#783d01] border border-[#9f3d00]/30 shadow-2xs font-bold'
+                        : 'bg-[#f8ece5] text-[#201a17] hover:bg-[#f2e6df]'
+                    }`}
                   >
                     <span className="material-symbols-outlined text-[16px] text-[#00685d]">eco</span>
                     <span>{selectedDietary || 'Dietary'}</span>
-                    <span className="material-symbols-outlined text-[14px]">expand_more</span>
+                    {selectedDietary ? (
+                      <span 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedDietary(null);
+                        }}
+                        className="material-symbols-outlined text-[14px] hover:text-[#9f3d00] ml-0.5 p-0.5 rounded-full hover:bg-black/5"
+                        title="Clear dietary preference"
+                      >
+                        close
+                      </span>
+                    ) : (
+                      <span className="material-symbols-outlined text-[14px]">expand_more</span>
+                    )}
                   </button>
                   {showFiltersDropdown === 'dietary' && (
-                    <div className="absolute top-full mt-2 left-0 w-40 bg-white rounded-xl shadow-xl border border-stone-200 p-2 z-30 flex flex-col gap-1">
-                      {['All Diets', 'Gluten-Free', 'Vegetarian', 'High-Protein', 'Keto'].map(d => (
+                    <div className="absolute top-full mt-1.5 left-0 w-44 bg-white rounded-xl shadow-2xl border border-[#e1bfb2]/60 p-1.5 z-50 flex flex-col gap-0.5 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-2 py-1 text-[10px] uppercase font-bold text-[#8d7165] tracking-wider border-b border-[#f8ece5]">Dietary Preference</div>
+                      {['All Diets', 'Gluten-Free', 'Vegetarian', 'High-Protein', 'Keto', 'Vegan'].map(d => (
                         <button
                           key={d}
                           type="button"
@@ -889,21 +976,41 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                             setSelectedDietary(d === 'All Diets' ? null : d);
                             setShowFiltersDropdown(null);
                           }}
-                          className="text-left px-3 py-1.5 text-xs text-stone-700 hover:bg-[#fef1ea] hover:text-[#9f3d00] rounded-lg font-medium"
+                          className={`text-left px-2.5 py-1.5 text-xs rounded-lg font-medium transition-colors flex items-center justify-between cursor-pointer ${
+                            (selectedDietary === d || (!selectedDietary && d === 'All Diets'))
+                              ? 'bg-[#fef1ea] text-[#9f3d00] font-bold'
+                              : 'text-stone-700 hover:bg-[#fef1ea] hover:text-[#9f3d00]'
+                          }`}
                         >
-                          {d}
+                          <span>{d}</span>
+                          {(selectedDietary === d || (!selectedDietary && d === 'All Diets')) && (
+                            <span className="material-symbols-outlined text-[14px]">check</span>
+                          )}
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
 
+                {/* Reset Filters if any filter is active */}
+                {(selectedCuisine || selectedCookTime || selectedDietary || searchInput) && (
+                  <button
+                    type="button"
+                    onClick={handleClearAllFilters}
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs font-semibold transition-colors cursor-pointer"
+                    title="Reset all search filters"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">restart_alt</span>
+                    <span>Reset</span>
+                  </button>
+                )}
+
                 <button 
                   type="submit"
-                  className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#9f3d00] text-white hover:bg-[#c74e00] transition-colors text-xs font-bold shadow-xs cursor-pointer shrink-0 ml-auto"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#9f3d00] text-white hover:bg-[#c74e00] transition-colors text-xs font-bold shadow-xs cursor-pointer ml-auto"
                 >
                   <span className="material-symbols-outlined text-[16px]">tune</span>
-                  <span className="hidden sm:inline">Apply</span>
+                  <span>Filter Recipes</span>
                 </button>
               </div>
             </form>
