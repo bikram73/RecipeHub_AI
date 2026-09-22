@@ -408,13 +408,3 @@ To ensure reliable, safe, and delicious recipes, RecipeHub AI utilizes specializ
 2. **Extreme Ingredient Quantities**: When inputting unusual non-culinary terms, the prompt validator sanitizer flags and sanitizes inputs before AI processing.
 3. **Serving Size Scaling**: Nutritional values scale linearly; complex reductions or salt concentrations should be adjusted to taste.
 
----
-
-<a name="license"></a>
-## 📄 License
-
-This project is open-source and distributed under the **MIT License**. See `LICENSE` for details.
-
-<div align="center">
-Crafted with ❤️ for food lovers and culinary innovators everywhere.
-</div>
