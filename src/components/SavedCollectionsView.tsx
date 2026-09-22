@@ -26,6 +26,7 @@ interface SavedCollectionsViewProps {
   onStartCooking: (recipe: Recipe, e: React.MouseEvent) => void;
   onNavigateToExplore: () => void;
   onOpenAddToCollection?: (recipe: Recipe) => void;
+  initialTab?: 'saved' | 'collections';
 }
 
 export const SavedCollectionsView: React.FC<SavedCollectionsViewProps> = ({
@@ -35,9 +36,18 @@ export const SavedCollectionsView: React.FC<SavedCollectionsViewProps> = ({
   onStartCooking,
   onNavigateToExplore,
   onOpenAddToCollection,
+  initialTab = 'saved',
 }) => {
   const [collections, setCollections] = useState<Collection[]>(getCollections());
-  const [activeCollectionId, setActiveCollectionId] = useState<string>('all');
+  const [activeCollectionId, setActiveCollectionId] = useState<string>(() => {
+    if (initialTab === 'collections') {
+      const existing = getCollections();
+      if (existing.length > 0) {
+        return existing[0].id;
+      }
+    }
+    return 'all';
+  });
   const [searchFilter, setSearchFilter] = useState<string>('');
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');

@@ -44,6 +44,12 @@ export default function App() {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
 
   const handleTabChange = (tab: ActiveTab) => {
+    if (tab === 'create-recipe') {
+      setRecipeToEdit(null);
+      setIsCreateEditModalOpen(true);
+      setActiveTab('my-recipes');
+      return;
+    }
     if (tab === 'my-recipes') {
       const isConfigured = isOnboarded() && profile.name && profile.name.trim() !== '' && profile.name !== 'Home Chef';
       if (!isConfigured) {
@@ -516,7 +522,7 @@ export default function App() {
           </div>
         )}
 
-        {activeTab === 'saved' && (
+        {(activeTab === 'saved' || activeTab === 'collections') && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <SavedCollectionsView
               recipes={recipes}
@@ -524,11 +530,12 @@ export default function App() {
               onToggleSave={handleToggleSave}
               onStartCooking={handleStartCooking}
               onNavigateToExplore={() => setActiveTab('explore')}
+              initialTab={activeTab === 'collections' ? 'collections' : 'saved'}
             />
           </div>
         )}
 
-        {activeTab === 'my-recipes' && (
+        {(activeTab === 'my-recipes' || activeTab === 'create-recipe') && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <MyRecipesView
               profile={profile}
@@ -608,6 +615,47 @@ export default function App() {
               }}
             />
           </div>
+        )}
+
+        {/* Fallback view if activeTab is unset or invalid */}
+        {![
+          'home',
+          'explore',
+          'generator',
+          'ai-kitchen',
+          'pantry',
+          'planner',
+          'groceries',
+          'saved',
+          'collections',
+          'my-recipes',
+          'create-recipe',
+          'following',
+          'profile',
+          'activity',
+          'settings',
+        ].includes(activeTab) && (
+          <HomeLandingView
+            recipes={recipes}
+            savedRecipeIds={new Set(recipes.filter((r) => r.isSaved).map((r) => r.id))}
+            onSearch={(query) => setSearchQuery(query)}
+            onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
+            onToggleSave={handleToggleSave}
+            onStartCooking={handleStartCooking}
+            onOpenCreateRecipe={() => {
+              setRecipeToEdit(null);
+              setIsCreateEditModalOpen(true);
+            }}
+            onOpenAskAi={handleOpenAskAi}
+            onNavigate={(tab) => {
+              if (tab === 'create-recipe') {
+                setRecipeToEdit(null);
+                setIsCreateEditModalOpen(true);
+              } else {
+                handleTabChange(tab as ActiveTab);
+              }
+            }}
+          />
         )}
       </main>
 
