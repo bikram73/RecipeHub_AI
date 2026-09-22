@@ -564,35 +564,54 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <div className="flex flex-wrap items-center gap-3 pt-2 relative z-30">
                 <button
+                  type="button"
                   id="hero-explore-btn"
-                  onClick={() => onNavigate('explore')}
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-[#9f3d00] hover:bg-[#c74e00] text-white font-semibold text-base rounded-xl shadow-md shadow-[#9f3d00]/25 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onNavigate('explore');
+                  }}
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-[#9f3d00] hover:bg-[#c74e00] text-white font-semibold text-base rounded-xl shadow-md shadow-[#9f3d00]/25 transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer select-none"
                 >
                   <span>Explore Recipes</span>
                   <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
                 </button>
 
                 <button
+                  type="button"
                   id="hero-create-btn"
-                  onClick={() => {
-                    if (onOpenCreateRecipe) onOpenCreateRecipe();
-                    else onNavigate('create-recipe');
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (onOpenCreateRecipe) {
+                      onOpenCreateRecipe();
+                    } else {
+                      onNavigate('create-recipe');
+                    }
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-[#f8ece5] hover:bg-[#f2e6df] text-[#9f3d00] font-semibold text-base rounded-xl shadow-xs transition-all duration-200 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-[#f8ece5] hover:bg-[#f2e6df] text-[#9f3d00] font-semibold text-base rounded-xl shadow-xs transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer select-none border border-[#e1bfb2]/40 hover:border-[#9f3d00]/40"
+                  title="Create and publish your custom recipe"
                 >
                   <span className="material-symbols-outlined text-[20px]">post_add</span>
                   <span>Create Recipe</span>
                 </button>
 
                 <button
+                  type="button"
                   id="hero-ask-ai-btn"
-                  onClick={() => {
-                    if (onOpenAskAi) onOpenAskAi();
-                    else onNavigate('ai-kitchen');
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (onOpenAskAi) {
+                      onOpenAskAi();
+                    } else {
+                      onNavigate('ai-kitchen');
+                    }
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-white text-[#783d01] font-semibold text-base rounded-xl shadow-md hover:shadow-lg border border-[#e1bfb2]/40 transition-all duration-200 cursor-pointer hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-white text-[#783d01] font-semibold text-base rounded-xl shadow-md hover:shadow-lg border border-[#e1bfb2]/50 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:scale-95 select-none"
+                  title="Open Gemini AI Culinary Sommelier"
                 >
                   <span className="material-symbols-outlined text-[#8e4e14] text-[20px]">psychology</span>
                   <span>Ask AI</span>
