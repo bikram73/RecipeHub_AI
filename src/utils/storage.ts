@@ -234,7 +234,7 @@ export function getActivity(): ActivityItem[] {
       id: 'act-4',
       type: 'generated_ai',
       title: 'AI Recipe Generated',
-      description: 'Invented 15-Min Skillet Caprese Chicken using Gemini AI',
+      description: 'Invented 15-Min Skillet Caprese Chicken using Culinary AI',
       timestamp: new Date(Date.now() - 259200000).toISOString(),
       recipeTitle: '15-Min Skillet Caprese Chicken',
     },

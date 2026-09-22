@@ -544,7 +544,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
       { stepNumber: 2, instruction: 'Add garlic and cherry tomatoes; cover pan for 3 minutes until tomatoes burst.', timerMinutes: 3 },
       { stepNumber: 3, instruction: 'Toss with fresh basil chiffonade and drizzle with balsamic glaze.', timerMinutes: 2 }
     ],
-    author: { name: 'Chef Gemini Assistant', avatar: CHEF_GIRL_AVATAR, role: 'AI Culinary Intelligence' },
+    author: { name: 'Chef Culinary Assistant', avatar: CHEF_GIRL_AVATAR, role: 'AI Culinary Intelligence' },
     isAiGenerated: true
   };
 
@@ -588,7 +588,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
               </h1>
 
               <p className="text-sm sm:text-base lg:text-lg text-[#594137] max-w-xl leading-relaxed">
-                Explore delicious seasonal recipes, discover adventurous culinary pairings, and let personalized Gemini intelligence turn your pantry ingredients into restaurant-grade meals.
+                Explore delicious seasonal recipes, discover adventurous culinary pairings, and let personalized culinary intelligence turn your pantry ingredients into restaurant-grade meals.
               </p>
 
               {/* Action Buttons - Stack on mobile, inline on tablet/desktop */}
@@ -639,7 +639,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                     }
                   }}
                   className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-[#783d01] font-semibold text-sm sm:text-base rounded-xl shadow-md hover:shadow-lg border border-[#e1bfb2]/50 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:scale-95 select-none"
-                  title="Open Gemini AI Culinary Sommelier"
+                  title="Open AI Culinary Sommelier"
                 >
                   <span className="material-symbols-outlined text-[#8e4e14] text-[20px]">psychology</span>
                   <span>Ask AI</span>
@@ -757,7 +757,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs text-[#201a17] font-bold flex items-center gap-1">
-                    <span>Gemini Kitchen Insight</span>
+                    <span>Kitchen AI Insight</span>
                     <span className="text-[10px] text-[#9f3d00] font-bold">✨ Tap to cook</span>
                   </span>
                   <span className="text-[11px] sm:text-xs text-[#594137]">"Substitute coconut cream for lactose-free Tuscan salmon!"</span>
@@ -1039,7 +1039,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                 <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-white/15 backdrop-blur-md w-fit">
                   <span className="material-symbols-outlined text-[#ffdcc4] text-[16px] sm:text-[18px]">auto_awesome</span>
                   <span className="text-[10px] sm:text-[11px] text-white font-semibold uppercase tracking-wider">
-                    Gemini 2.5 Flash Culinary Engine
+                    Smart Culinary Engine
                   </span>
                 </div>
 
@@ -1148,7 +1148,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                         <span className="material-symbols-outlined text-[16px] sm:text-[18px]">smart_toy</span>
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-[#201a17]">Chef Gemini Assistant</p>
+                        <p className="text-xs font-bold text-[#201a17]">Chef Culinary Assistant</p>
                         <p className="text-[10px] text-[#00685d] flex items-center gap-1 font-semibold">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#00685d] animate-pulse" /> Ready to invent recipes
                         </p>
@@ -1937,7 +1937,7 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
                 Frequently Asked Culinary Questions
               </h2>
               <p className="text-xs sm:text-sm text-[#594137] mt-1">
-                Everything you need to know about recipes, Gemini AI kitchen, and pantry matching.
+                Everything you need to know about recipes, smart AI kitchen, and pantry matching.
               </p>
             </div>
 
@@ -1945,8 +1945,8 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
               {[
                 {
                   id: 0,
-                  q: 'How does the Gemini AI recipe generator create meals from my leftovers?',
-                  a: 'Gemini analyzes the flavor profiles, textures, and cooking dynamics of the ingredients you specify, identifying classic culinary matches and culinary transformations. It outputs exact measurements, prep times, and step-by-step instructions tailored to your dietary goals.',
+                  q: 'How does the AI recipe generator create meals from my leftovers?',
+                  a: 'The culinary intelligence engine analyzes the flavor profiles, textures, and cooking dynamics of the ingredients you specify, identifying classic culinary matches and culinary transformations. It outputs exact measurements, prep times, and step-by-step instructions tailored to your dietary goals.',
                 },
                 {
                   id: 1,
@@ -2031,13 +2031,13 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
               <div 
                 onClick={() => onNavigate('ai-kitchen')}
                 className="flex items-center gap-3 justify-center sm:justify-start p-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer group active:scale-98"
-                title="Launch Gemini AI Kitchen"
+                title="Launch Smart AI Kitchen"
               >
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white text-[#8e4e14] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30 group-hover:scale-105 transition-transform">
                   <span className="material-symbols-outlined text-[22px] sm:text-[26px]">cognition</span>
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className="font-serif text-base sm:text-lg text-[#201a17] font-bold group-hover:text-[#8e4e14] transition-colors">Gemini AI Inside</span>
+                  <span className="font-serif text-base sm:text-lg text-[#201a17] font-bold group-hover:text-[#8e4e14] transition-colors">Culinary AI Inside</span>
                   <span className="text-[11px] sm:text-xs text-[#594137]">Smart substitutions & scaling</span>
                 </div>
               </div>

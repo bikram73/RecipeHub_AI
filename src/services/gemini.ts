@@ -222,7 +222,7 @@ export async function askCulinaryAssistant(
 4. **Sauce**: Whisk 1 tbsp soy sauce, 1 tsp maple syrup, 1 tsp chili crisp, and a squeeze of lime!`;
   }
 
-  return `Chef Gemini recommendation:
+  return `Chef Culinary Assistant recommendation:
 When preparing ${contextRecipe ? `"${contextRecipe.title}"` : 'your dish'}, remember the core secret to gourmet restaurant flavor:
 1. **Season in layers**: Salt meat before searing, season sautéed aromatics, and adjust at final plating.
 2. **Balance with acid**: If a dish feels heavy, a squeeze of fresh lemon juice or dash of sherry vinegar instantly brightens it.
@@ -345,7 +345,7 @@ function normalizeRecipePayload(data: any): Recipe {
     id,
     title: data.title || 'Chef AI Signature Plate',
     subtitle: data.subtitle || 'Personalized culinary creation',
-    description: data.description || 'Invented with Gemini culinary intelligence.',
+    description: data.description || 'Invented with smart culinary intelligence.',
     imageUrl: data.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=80',
     cuisine: data.cuisine || 'Modern Fusion',
     category: (data.category as any) || 'dinner',
@@ -385,9 +385,9 @@ function normalizeRecipePayload(data: any): Recipe {
     chefTips: data.chefTips || ['Toast dry spices for 30 seconds before adding liquids.'],
     winePairing: data.winePairing || 'Crisp Sauvignon Blanc or Sparkling Mineral Water',
     author: {
-      name: 'Chef Gemini Assistant',
+      name: 'Chef Culinary Assistant',
       avatar: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=200&q=80',
-      role: 'Gemini AI Culinary Sommelier',
+      role: 'AI Culinary Sommelier',
     },
     isAiGenerated: true,
     isSaved: false,
@@ -470,9 +470,9 @@ function generateClientFallbackRecipe(ingredients: string[], options?: any): Rec
     ],
     winePairing: 'Crisp Pinot Grigio or chilled sparkling water with cucumber ribbon',
     author: {
-      name: 'Chef Gemini Assistant',
+      name: 'Chef Culinary Assistant',
       avatar: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=200&q=80',
-      role: 'Gemini AI Culinary Intelligence',
+      role: 'AI Culinary Intelligence',
     },
     isAiGenerated: true,
     isSaved: false,

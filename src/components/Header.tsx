@@ -380,7 +380,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {[
                   { id: 'home', label: 'Home Feed', desc: 'Featured recipes & daily picks', icon: Home },
                   { id: 'explore', label: 'Explore Catalog', desc: '12,000+ curated recipes & filters', icon: Compass },
-                  { id: 'ai-kitchen', label: 'AI Kitchen Forge', desc: 'Gemini recipe generator & sommelier', icon: Sparkles, badge: '✨ AI' },
+                  { id: 'ai-kitchen', label: 'AI Kitchen Forge', desc: 'Smart recipe generator & sommelier', icon: Sparkles, badge: '✨ AI' },
                   { id: 'my-recipes', label: 'My Creations', desc: 'Your personal custom recipes', icon: ChefHat, count: myRecipesCount },
                 ].map(({ id, label, desc, icon: Icon, badge, count }) => {
                   const isActive = activeTab === id || (id === 'ai-kitchen' && activeTab === 'generator');

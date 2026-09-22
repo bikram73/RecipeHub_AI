@@ -70,7 +70,7 @@ export const MyRecipesView: React.FC<MyRecipesViewProps> = ({
               {profile.name || 'Chef Studio'}
             </h1>
             <p className="text-xs sm:text-sm text-[#594137] max-w-md mt-0.5">
-              {profile.bio || 'Culinary creator experimenting with bespoke recipes and Gemini AI flavor pairings.'}
+              {profile.bio || 'Culinary creator experimenting with bespoke recipes and gourmet flavor pairings.'}
             </p>
 
             <div className="flex items-center justify-center sm:justify-start gap-4 mt-3 text-xs text-[#594137]">

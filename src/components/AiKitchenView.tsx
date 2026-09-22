@@ -50,7 +50,7 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
   const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'ai'; text: string }[]>([
     {
       sender: 'ai',
-      text: 'Hello Chef! I am your AI Culinary Sommelier powered by Gemini 3.8. Ask me about flavor pairings, ingredient substitutes, oven temperatures, nutrition tweaks, or cooking troubleshooting!',
+      text: 'Hello Chef! I am your AI Culinary Sommelier. Ask me about flavor pairings, ingredient substitutes, oven temperatures, nutrition tweaks, or cooking troubleshooting!',
     },
   ]);
   const [isChatLoading, setIsChatLoading] = useState(false);
@@ -163,7 +163,7 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold uppercase tracking-wider mb-2">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Gemini 3.8 Flash Culinary Intelligence</span>
+              <span>Smart Culinary Intelligence</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-serif font-bold tracking-tight">AI Kitchen Studio</h1>
             <p className="text-sm text-white/90 mt-2 leading-relaxed">
@@ -360,7 +360,7 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
                 </div>
                 <h3 className="font-serif text-xl font-bold text-gray-900">Crafting Culinary Masterpiece...</h3>
                 <p className="text-xs text-gray-500 mt-2 max-w-sm">
-                  Gemini is pairing your ingredients, calibrating spices, calculating macros, and writing step-by-step instructions.
+                  The culinary engine is pairing your ingredients, calibrating spices, calculating macros, and writing step-by-step instructions.
                 </p>
               </div>
             )}
@@ -372,7 +372,7 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
                 </div>
                 <h3 className="font-serif text-xl font-bold text-gray-900">Ready to Create Something Delicious</h3>
                 <p className="text-xs text-gray-500 mt-2 max-w-md">
-                  Choose your ingredients on the left and tap Generate. Gemini will return a complete, structured recipe ready to cook or save.
+                  Choose your ingredients on the left and tap Generate. The culinary engine will return a complete, structured recipe ready to cook or save.
                 </p>
               </div>
             )}
@@ -508,7 +508,7 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
                   <ChefHat className="w-4 h-4" />
                 </div>
                 <div className="p-3 bg-white border border-gray-200 rounded-2xl rounded-tl-none text-xs text-gray-500">
-                  Chef Gemini is formulating culinary advice...
+                  The Culinary Assistant is formulating culinary advice...
                 </div>
               </div>
             )}
@@ -636,7 +636,7 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
               <span>Recipe Optimization & Dietary Rewriter</span>
             </h2>
             <p className="text-xs text-gray-500 mt-1">
-              Select any existing recipe and let Gemini intelligently rewrite it to be healthier, vegan, faster, or higher in protein.
+              Select any existing recipe and let the AI intelligently rewrite it to be healthier, vegan, faster, or higher in protein.
             </p>
           </div>
 
