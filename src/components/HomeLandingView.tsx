@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Recipe, Ingredient } from '../types';
 
 export const CHEF_GIRL_AVATAR = "https://lh3.googleusercontent.com/aida-public/AB6AXuBqFsPqlgKaJLcJMJE0hI4VdayHVGCKYRRtApWeU_lblTpqGORD2CyDIQbyMEb25h_6eDMxwDT9MVTWjit3yrJiTAzopWdAMNAF5QgCw6oj-RiXH4VAKlrWvvqoJ-CgQqy5qQNPAdi5S6m7SoeHhBRl5G1OqpBCs4ksRJcmnaFwIdB4-o3jb37Jn_TxesjE4EBcz-uGo2LAC2koQfSPG0gV_VQGiKu8NGmq5PeDu8jY7vmizIqspmroxg";
@@ -29,6 +29,36 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
   const [searchInput, setSearchInput] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [activeTrendingIndex, setActiveTrendingIndex] = useState(0);
+
+  // Seasonal produce state
+  const [activeSeason, setActiveSeason] = useState<'spring' | 'summer' | 'autumn' | 'winter'>('summer');
+  
+  // Culinary Tips & Masterclass interactive state
+  const [expandedTipId, setExpandedTipId] = useState<number | null>(0);
+
+  // Cooking Timer Demo State
+  const [demoTimerSeconds, setDemoTimerSeconds] = useState<number>(180);
+  const [isDemoTimerRunning, setIsDemoTimerRunning] = useState<boolean>(false);
+  const [activeDemoStep, setActiveDemoStep] = useState<number>(1);
+
+  useEffect(() => {
+    let interval: any;
+    if (isDemoTimerRunning && demoTimerSeconds > 0) {
+      interval = setInterval(() => {
+        setDemoTimerSeconds((prev) => {
+          if (prev <= 1) {
+            setIsDemoTimerRunning(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isDemoTimerRunning, demoTimerSeconds]);
+
+  // FAQ Accordion State
+  const [expandedFaqId, setExpandedFaqId] = useState<number | null>(null);
 
   // Interactive AI fridge chips
   const [fridgeChips, setFridgeChips] = useState<string[]>([
@@ -1297,7 +1327,672 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
           </div>
         </section>
 
-        {/* 7. COMMUNITY & LOCAL STATS STRIP */}
+        {/* 7. SEASONAL HARVEST & FLAVOR PAIRING MATRIX */}
+        <section className="mt-12 sm:mt-20">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fef1ea] text-[#9f3d00] text-xs font-bold mb-2">
+                <span className="material-symbols-outlined text-[16px]">psychiatry</span>
+                <span>Peak Season Flavor Intelligence</span>
+              </div>
+              <h2 className="font-serif text-2xl sm:text-3xl text-[#201a17] font-bold tracking-tight">
+                Seasonal In-Season Harvest & Pairings
+              </h2>
+              <p className="text-xs sm:text-sm text-[#594137] mt-1">
+                Cook at the peak of flavor, nutrient density, and sustainable freshness.
+              </p>
+            </div>
+
+            {/* Season switcher tabs */}
+            <div className="flex items-center gap-1 p-1 bg-[#f8ece5] rounded-xl self-start sm:self-auto border border-[#e1bfb2]/30">
+              {[
+                { id: 'spring', label: '🌸 Spring' },
+                { id: 'summer', label: '☀️ Summer' },
+                { id: 'autumn', label: '🍂 Autumn' },
+                { id: 'winter', label: '❄️ Winter' },
+              ].map((season) => (
+                <button
+                  key={season.id}
+                  onClick={() => setActiveSeason(season.id as any)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeSeason === season.id
+                      ? 'bg-white text-[#9f3d00] shadow-xs'
+                      : 'text-[#594137] hover:text-[#201a17]'
+                  }`}
+                >
+                  {season.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Seasonal items cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {{
+              spring: [
+                {
+                  name: 'Wild Green Asparagus',
+                  tag: 'Peak Tender',
+                  pairings: ['Poached Egg', 'Meyer Lemon', 'Parmigiano-Reggiano', 'Hollandaise'],
+                  technique: 'Quick Blanche & Butter Baste',
+                  searchQuery: 'Asparagus',
+                  bg: 'bg-emerald-50 text-emerald-800 border-emerald-100',
+                  icon: 'grass',
+                },
+                {
+                  name: 'English Sweet Peas & Mint',
+                  tag: 'Sweet & Crisp',
+                  pairings: ['Goat Cheese', 'Shallots', 'White Wine', 'Pancetta'],
+                  technique: 'Gentle Puree or Risotto Fold',
+                  searchQuery: 'Peas Mint',
+                  bg: 'bg-lime-50 text-lime-800 border-lime-100',
+                  icon: 'spa',
+                },
+                {
+                  name: 'Wild Morel Mushrooms',
+                  tag: 'Earthy Umami',
+                  pairings: ['Heavy Cream', 'Cognac', 'Thyme', 'Filet Mignon'],
+                  technique: 'Cast Iron Sauté & Deglaze',
+                  searchQuery: 'Morel Mushroom',
+                  bg: 'bg-amber-50 text-amber-800 border-amber-100',
+                  icon: 'nature',
+                },
+                {
+                  name: 'Artisan Strawberries',
+                  tag: 'Juicy Tart',
+                  pairings: ['Aged Balsamic', 'Fresh Basil', 'Burrata', 'Mascarpone'],
+                  technique: 'Maceration & Glaze Reduction',
+                  searchQuery: 'Strawberry Basil',
+                  bg: 'bg-rose-50 text-rose-800 border-rose-100',
+                  icon: 'nutrition',
+                },
+              ],
+              summer: [
+                {
+                  name: 'Heirloom Vine Tomatoes',
+                  tag: 'Peak Acidity & Sugar',
+                  pairings: ['Fior di Latte', 'EVOO', 'Maldon Sea Salt', 'Fresh Basil'],
+                  technique: 'Raw Carpaccio or Slow Roast on Vine',
+                  searchQuery: 'Heirloom Tomato',
+                  bg: 'bg-red-50 text-red-800 border-red-100',
+                  icon: 'temp_preferences_custom',
+                },
+                {
+                  name: 'Sweet Bicolor Corn',
+                  tag: 'Golden Crisp',
+                  pairings: ['Smoked Paprika', 'Cotija Cheese', 'Lime Crema', 'Cilantro'],
+                  technique: 'High-Heat Char & Compound Butter',
+                  searchQuery: 'Sweet Corn',
+                  bg: 'bg-amber-50 text-amber-800 border-amber-100',
+                  icon: 'grain',
+                },
+                {
+                  name: 'Genovese Sweet Basil',
+                  tag: 'Aromatic Citrus',
+                  pairings: ['Pine Nuts', 'Garlic', 'Pecorino Romano', 'Grilled Salmon'],
+                  technique: 'Cold-Mortar Crushed Pesto',
+                  searchQuery: 'Pesto Basil',
+                  bg: 'bg-emerald-50 text-emerald-800 border-emerald-100',
+                  icon: 'eco',
+                },
+                {
+                  name: 'Ripe Yellow Peaches',
+                  tag: 'Stone Fruit Sweetness',
+                  pairings: ['Prosciutto di Parma', 'Burrata', 'Hot Honey', 'Arugula'],
+                  technique: 'Direct Grill Mark & Glaze',
+                  searchQuery: 'Grilled Peach Salad',
+                  bg: 'bg-orange-50 text-orange-800 border-orange-100',
+                  icon: 'local_florist',
+                },
+              ],
+              autumn: [
+                {
+                  name: 'Roasted Butternut Squash',
+                  tag: 'Velvety Sweet',
+                  pairings: ['Brown Butter', 'Crispy Sage', 'Nutmeg', 'Pecorino'],
+                  technique: 'Caramelized Oven Roast & Puree',
+                  searchQuery: 'Butternut Squash',
+                  bg: 'bg-amber-50 text-amber-800 border-amber-100',
+                  icon: 'bakery_dining',
+                },
+                {
+                  name: 'Golden Chanterelle Mushrooms',
+                  tag: 'Apricot & Woody Note',
+                  pairings: ['Shallots', 'Heavy Cream', 'Tagliatelle', 'Flat Parsley'],
+                  technique: 'Dry Sauté then Butter Glaze',
+                  searchQuery: 'Chanterelle Pasta',
+                  bg: 'bg-yellow-50 text-yellow-800 border-yellow-100',
+                  icon: 'nature_people',
+                },
+                {
+                  name: 'Honeycrisp Apples',
+                  tag: 'Tart Snap',
+                  pairings: ['Sharp Cheddar', 'Pork Tenderloin', 'Cinnamon', 'Walnuts'],
+                  technique: 'Cider Pan Reduction',
+                  searchQuery: 'Apple Pork',
+                  bg: 'bg-rose-50 text-rose-800 border-rose-100',
+                  icon: 'apple',
+                },
+                {
+                  name: 'Tuscan Lacinato Kale',
+                  tag: 'Mineral Rich',
+                  pairings: ['Cannellini Beans', 'Garlic Confit', 'Lemon', 'Parmesan'],
+                  technique: 'Braised Slow Stew or Ribbon Massage',
+                  searchQuery: 'Tuscan Kale',
+                  bg: 'bg-emerald-50 text-emerald-800 border-emerald-100',
+                  icon: 'forest',
+                },
+              ],
+              winter: [
+                {
+                  name: 'Sicilian Blood Oranges',
+                  tag: 'Ruby Citrus',
+                  pairings: ['Shaved Fennel', 'Castelvetrano Olives', 'Sea Salt', 'Duck'],
+                  technique: 'Citrus Segment Supremes',
+                  searchQuery: 'Blood Orange Fennel',
+                  bg: 'bg-rose-50 text-rose-800 border-rose-100',
+                  icon: 'wb_sunny',
+                },
+                {
+                  name: 'Florence Herb Fennel',
+                  tag: 'Crisp Anise',
+                  pairings: ['Seared Scallops', 'Pernod', 'Orange Zest', 'Tarragon'],
+                  technique: 'Caramelized Braise & Shaved Slaw',
+                  searchQuery: 'Fennel Scallops',
+                  bg: 'bg-emerald-50 text-emerald-800 border-emerald-100',
+                  icon: 'spa',
+                },
+                {
+                  name: 'Rainbow Carrots & Parsnips',
+                  tag: 'Earthy Sweet',
+                  pairings: ['Wild Honey', 'Fresh Thyme', 'Toasted Cumin', 'Labneh'],
+                  technique: 'High-Temp Maple Roast',
+                  searchQuery: 'Roasted Root Vegetables',
+                  bg: 'bg-amber-50 text-amber-800 border-amber-100',
+                  icon: 'agriculture',
+                },
+                {
+                  name: 'Pomegranate Jewels',
+                  tag: 'Crisp Ruby Burst',
+                  pairings: ['Roast Lamb', 'Pistachios', 'Tahini', 'Mint'],
+                  technique: 'Fresh Garnish & Molasses Reduction',
+                  searchQuery: 'Pomegranate Lamb',
+                  bg: 'bg-red-50 text-red-800 border-red-100',
+                  icon: 'flare',
+                },
+              ]}[activeSeason].map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-2xl p-5 border border-[#e1bfb2]/30 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center border ${item.bg}`}>
+                        <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                      </div>
+                      <span className="text-[11px] font-bold text-[#9f3d00] bg-[#fef1ea] px-2 py-0.5 rounded-full">
+                        {item.tag}
+                      </span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-serif text-base font-bold text-[#201a17] group-hover:text-[#9f3d00] transition-colors">
+                    {item.name}
+                  </h3>
+
+                  <div className="mt-3 space-y-1.5">
+                    <span className="text-[10px] uppercase font-bold text-[#8d7165] tracking-wider block">
+                      Perfect Flavor Partners:
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {item.pairings.map((p, pIdx) => (
+                        <span key={pIdx} className="text-[11px] bg-[#f8ece5] text-[#594137] px-2 py-0.5 rounded-md font-medium">
+                          {p}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-2.5 border-t border-[#f8ece5] text-[11px] text-[#594137]">
+                    <strong className="text-[#201a17]">Technique:</strong> {item.technique}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onSearch) onSearch(item.searchQuery);
+                    onNavigate('explore');
+                  }}
+                  className="mt-4 w-full py-2 rounded-xl bg-[#fef1ea] hover:bg-[#9f3d00] hover:text-white text-[#9f3d00] text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>Explore {item.name.split(' ')[0]} Recipes</span>
+                  <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 8. MASTERCLASS CULINARY TECHNIQUES (Interactive Accordion / Cards) */}
+        <section className="mt-12 sm:mt-20">
+          <div className="bg-gradient-to-r from-[#201a17] via-[#2d221c] to-[#3a2c24] rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden">
+            
+            {/* Ambient Background Visual */}
+            <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[#ffab69]/10 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-[#00685d]/15 blur-3xl pointer-events-none" />
+
+            <div className="relative z-10">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[#ffdcc4] text-xs font-semibold mb-2">
+                    <span className="material-symbols-outlined text-[16px]">menu_book</span>
+                    <span>Pro Kitchen Fundamentals</span>
+                  </div>
+                  <h2 className="font-serif text-2xl sm:text-4xl text-white font-bold tracking-tight">
+                    Culinary Masterclass & Chef Principles
+                  </h2>
+                  <p className="text-xs sm:text-sm text-white/80 mt-1 max-w-xl">
+                    Master the four foundational pillars that separate everyday cooking from restaurant-caliber gastronomical craft.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => onNavigate('ai-kitchen')}
+                  className="px-4 py-2.5 rounded-xl bg-white text-[#201a17] text-xs font-bold hover:bg-[#ffdbcd] transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer shrink-0 shadow-md"
+                >
+                  <span className="material-symbols-outlined text-[16px] text-[#9f3d00]">auto_awesome</span>
+                  <span>Ask AI for Technique Coaching</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                {[
+                  {
+                    id: 0,
+                    title: 'The Maillard Reaction & Fond Deglazing',
+                    icon: 'local_fire_department',
+                    color: 'text-amber-400 bg-amber-400/10',
+                    subtitle: 'Building the foundation of all rich pan sauces and roasts.',
+                    keyTakeaway: 'Always pat proteins bone-dry before searing. High heat + zero moisture creates the deep golden crust without steaming.',
+                    steps: [
+                      'Preheat stainless steel or cast iron until shimmering oil ripples.',
+                      'Do not move the protein for the first 3-4 minutes to allow natural release.',
+                      'Deglaze caramelized fond with wine, stock, or vinegar while scraping bottom with a wooden spoon.',
+                    ],
+                  },
+                  {
+                    id: 1,
+                    title: 'The Balance of Acid, Fat, and Salt',
+                    icon: 'balance',
+                    color: 'text-emerald-400 bg-emerald-400/10',
+                    subtitle: 'Lifting heavy flavors and bringing dull sauces to life.',
+                    keyTakeaway: 'When a dish feels "flat" but salty enough, it almost always lacks acid (lemon, vinegar, wine) rather than salt.',
+                    steps: [
+                      'Fat carries flavor aromatics across the palate.',
+                      'Salt enhances natural sweetness and suppresses bitterness.',
+                      'Acid cuts richness and brightens baseline savoriness on the finish.',
+                    ],
+                  },
+                  {
+                    id: 2,
+                    title: 'Precision Knife Skills & Uniform Cuts',
+                    icon: 'carpenter',
+                    color: 'text-rose-400 bg-rose-400/10',
+                    subtitle: 'Why consistent geometric sizing prevents burnt aromatics.',
+                    keyTakeaway: 'Uniform vegetables cook at the exact same rate. Uneven cuts mean small pieces scorch before big pieces tenderize.',
+                    steps: [
+                      'The Claw Grip: Curl fingers inward with knuckle guiding the blade face.',
+                      'Brunoise (1/8") for fine aromatics; Mirepoix (1/2") for stocks and braises.',
+                      'Chiffonade herbs in a tight roll with a single clean slicing stroke.',
+                    ],
+                  },
+                  {
+                    id: 3,
+                    title: 'Internal Temperature & Protein Resting',
+                    icon: 'thermostat',
+                    color: 'text-blue-400 bg-blue-400/10',
+                    subtitle: 'Retaining succulent internal juices in meats and fish.',
+                    keyTakeaway: 'Carryover cooking will raise internal temperature by 5°F–10°F while muscle fibers relax and re-absorb juices.',
+                    steps: [
+                      'Remove meat from heat ~5°F below target doneness.',
+                      'Rest on a warm plate or cutting board for 8–10 minutes (do not wrap airtight in foil).',
+                      'Always slice across the grain to shorten muscle fibers for maximum tenderness.',
+                    ],
+                  },
+                ].map((tip) => {
+                  const isExpanded = expandedTipId === tip.id;
+                  return (
+                    <div
+                      key={tip.id}
+                      onClick={() => setExpandedTipId(isExpanded ? null : tip.id)}
+                      className={`rounded-2xl p-5 sm:p-6 transition-all border cursor-pointer ${
+                        isExpanded
+                          ? 'bg-white/10 border-white/30 shadow-lg'
+                          : 'bg-white/5 border-white/10 hover:bg-white/8'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${tip.color}`}>
+                            <span className="material-symbols-outlined text-[22px]">{tip.icon}</span>
+                          </div>
+                          <div>
+                            <h3 className="font-serif text-base sm:text-lg font-bold text-white leading-snug">
+                              {tip.title}
+                            </h3>
+                            <p className="text-xs text-white/70 mt-0.5">{tip.subtitle}</p>
+                          </div>
+                        </div>
+
+                        <span className="material-symbols-outlined text-white/60 text-[20px] shrink-0 mt-1">
+                          {isExpanded ? 'expand_less' : 'expand_more'}
+                        </span>
+                      </div>
+
+                      {isExpanded && (
+                        <div className="mt-4 pt-4 border-t border-white/15 space-y-3 animate-in fade-in duration-200">
+                          <div className="bg-[#9f3d00]/30 border border-[#ffab69]/30 rounded-xl p-3 text-xs text-[#ffdcc4] leading-relaxed">
+                            <strong className="text-white font-semibold">Chef's Golden Rule: </strong>
+                            {tip.keyTakeaway}
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <span className="text-[10px] uppercase tracking-wider font-bold text-white/60">Execution Steps:</span>
+                            {tip.steps.map((step, sIdx) => (
+                              <div key={sIdx} className="flex items-start gap-2 text-xs text-white/85">
+                                <span className="w-4 h-4 rounded-full bg-white/20 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                                  {sIdx + 1}
+                                </span>
+                                <span>{step}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 9. HANDS-FREE COOKING COMPANION SPOTLIGHT */}
+        <section className="mt-12 sm:mt-20">
+          <div className="bg-gradient-to-r from-[#fef1ea] via-white to-[#fff8f5] rounded-3xl border border-[#e1bfb2]/40 p-6 sm:p-10 shadow-md">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              <div className="lg:col-span-6 space-y-4">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffdbcd] text-[#9f3d00] text-xs font-bold">
+                  <span className="material-symbols-outlined text-[16px]">spatial_audio</span>
+                  <span>Kitchen Assistant Mode</span>
+                </div>
+
+                <h2 className="font-serif text-2xl sm:text-4xl text-[#201a17] font-bold tracking-tight leading-tight">
+                  Cook Hands-Free With Step Voice Reader & Built-in Timers
+                </h2>
+
+                <p className="text-xs sm:text-sm text-[#594137] leading-relaxed">
+                  Never smudge your screen with flour or olive oil. Our Interactive Cooking Mode guides you step-by-step with large high-contrast cards, audio narration, and simultaneous kitchen timers.
+                </p>
+
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="p-3 bg-white rounded-xl border border-[#e1bfb2]/30 shadow-2xs">
+                    <span className="material-symbols-outlined text-[#9f3d00] text-[20px] mb-1">volume_up</span>
+                    <h4 className="text-xs font-bold text-[#201a17]">Audio Speech Reader</h4>
+                    <p className="text-[11px] text-[#594137] mt-0.5">Listen to instructions as you prep.</p>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-[#e1bfb2]/30 shadow-2xs">
+                    <span className="material-symbols-outlined text-[#00685d] text-[20px] mb-1">timer</span>
+                    <h4 className="text-xs font-bold text-[#201a17]">Live Step Timers</h4>
+                    <p className="text-[11px] text-[#594137] mt-0.5">Auto-alerts when searing is done.</p>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      if (recipes.length > 0) onStartCooking(recipes[0]);
+                    }}
+                    className="px-5 py-3 rounded-xl bg-[#9f3d00] text-white text-xs sm:text-sm font-bold hover:bg-[#c74e00] shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">play_arrow</span>
+                    <span>Test Cooking Mode on Featured Dish</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Interactive Cooking Demo Card */}
+              <div className="lg:col-span-6">
+                <div className="bg-[#201a17] rounded-2xl p-5 sm:p-6 text-white shadow-xl border border-stone-800 space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                      <span className="text-xs font-bold tracking-wider text-emerald-300 uppercase">Live Step Preview</span>
+                    </div>
+                    <span className="text-xs text-white/60 font-mono">Step {activeDemoStep} of 4</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-serif text-lg sm:text-xl font-bold text-white">
+                      {activeDemoStep === 1 && "1. Sear Salmon Fillets to Crispy Golden Finish"}
+                      {activeDemoStep === 2 && "2. Deglaze Pan with White Wine & Shallots"}
+                      {activeDemoStep === 3 && "3. Emulsify Lemon Butter & Fresh Dill"}
+                      {activeDemoStep === 4 && "4. Plate with Microgreens & Sea Salt"}
+                    </h3>
+                    <p className="text-xs text-white/80 leading-relaxed">
+                      {activeDemoStep === 1 && "Place salmon skin-side down in shimmering hot oil. Press lightly with fish spatula for 10 seconds to ensure even skin contact. Cook undisturbed."}
+                      {activeDemoStep === 2 && "Lower heat to medium. Add minced shallots, deglaze with 2 oz crisp Sauvignon Blanc, scraping the caramelized golden fond from the pan bottom."}
+                      {activeDemoStep === 3 && "Whisk in chilled unsalted butter cubes one at a time over low heat. Finish with fresh lemon juice and chopped dill for a silky velouté."}
+                      {activeDemoStep === 4 && "Ladle velouté onto warm plates, arrange crisp salmon atop sauce, and finish with a pinch of flaky sea salt."}
+                    </p>
+                  </div>
+
+                  {/* Interactive Timer Widget in Demo */}
+                  <div className="bg-white/10 rounded-xl p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#9f3d00] flex items-center justify-center text-white">
+                        <span className="material-symbols-outlined text-[18px]">timer</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-white/60 block">Active Sear Timer</span>
+                        <span className="font-mono text-sm font-bold text-amber-300">
+                          {Math.floor(demoTimerSeconds / 60)}:{(demoTimerSeconds % 60).toString().padStart(2, '0')}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setIsDemoTimerRunning(!isDemoTimerRunning)}
+                        className="px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-xs font-bold text-white transition-colors cursor-pointer"
+                      >
+                        {isDemoTimerRunning ? 'Pause' : 'Start'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setDemoTimerSeconds(180);
+                          setIsDemoTimerRunning(false);
+                        }}
+                        className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs text-white/70 transition-colors cursor-pointer"
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Step Switchers */}
+                  <div className="flex items-center justify-between pt-1">
+                    <button
+                      disabled={activeDemoStep <= 1}
+                      onClick={() => setActiveDemoStep(s => Math.max(1, s - 1))}
+                      className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-40 text-xs text-white font-medium transition-colors cursor-pointer"
+                    >
+                      ← Previous Step
+                    </button>
+                    <button
+                      disabled={activeDemoStep >= 4}
+                      onClick={() => setActiveDemoStep(s => Math.min(4, s + 1))}
+                      className="px-3 py-1.5 rounded-lg bg-[#9f3d00] hover:bg-[#c74e00] disabled:opacity-40 text-xs text-white font-bold transition-colors cursor-pointer"
+                    >
+                      Next Step →
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* 10. COMMUNITY REVIEWS & HOME CHEF SUCCESS STORIES */}
+        <section className="mt-12 sm:mt-20">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fef1ea] text-[#9f3d00] text-xs font-bold mb-2">
+              <span className="material-symbols-outlined text-[16px]">reviews</span>
+              <span>Home Chef Testimonials</span>
+            </div>
+            <h2 className="font-serif text-2xl sm:text-4xl text-[#201a17] font-bold tracking-tight">
+              Loved by Home Cooks & Culinary Enthusiasts
+            </h2>
+            <p className="text-xs sm:text-sm text-[#594137] mt-1.5">
+              See how everyday cooks are saving time, eliminating food waste, and preparing restaurant-quality meals.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                name: 'Marcus Vance',
+                role: 'Father of 3 & Weekend Baker',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+                rating: 5,
+                dish: 'Garlic Butter Salmon & Dill Pasta',
+                quote: 'The AI Fridge Matcher is incredible. I typed in some leftover heavy cream, chicken, and spinach that was about to spoil, and it created the most velvety Tuscan chicken dinner in 20 minutes!',
+              },
+              {
+                name: 'Sophia Chen',
+                role: 'Fitness Coach & Meal Prepper',
+                avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80',
+                rating: 5,
+                dish: 'High-Protein Mediterranean Bowl',
+                quote: 'Being able to export weekly meal plans straight into grocery lists with exact measurements saved me over 3 hours of weekly grocery planning and cut my kitchen waste by half.',
+              },
+              {
+                name: 'Chef Julian Ross',
+                role: 'Culinary Instructor',
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+                rating: 5,
+                dish: 'Classic Beef Bourguignon',
+                quote: 'The step-by-step cooking mode with built-in sear timers is the closest thing to having a seasoned sous chef standing right beside you at the stove.',
+              },
+            ].map((test, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-3xl p-6 border border-[#e1bfb2]/30 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center gap-1 text-amber-500">
+                    {[...Array(test.rating)].map((_, rIdx) => (
+                      <span key={rIdx} className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        star
+                      </span>
+                    ))}
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-[#201a17] leading-relaxed italic">
+                    "{test.quote}"
+                  </p>
+
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#fef1ea] text-[#9f3d00] text-[11px] font-semibold">
+                    <span className="material-symbols-outlined text-[14px]">dinner_dining</span>
+                    <span>Cooked: {test.dish}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-4 mt-4 border-t border-[#f8ece5]">
+                  <img
+                    src={test.avatar}
+                    alt={test.name}
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-[#ffdbcd]"
+                  />
+                  <div>
+                    <h4 className="text-xs font-bold text-[#201a17]">{test.name}</h4>
+                    <span className="text-[11px] text-[#594137]">{test.role}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 11. CULINARY STUDIO FREQUENTLY ASKED QUESTIONS */}
+        <section className="mt-12 sm:mt-20">
+          <div className="bg-white rounded-3xl border border-[#e1bfb2]/40 p-6 sm:p-10 shadow-xs">
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <span className="material-symbols-outlined text-[#9f3d00] text-[28px]">help_center</span>
+              <h2 className="font-serif text-2xl sm:text-3xl text-[#201a17] font-bold tracking-tight mt-1">
+                Frequently Asked Culinary Questions
+              </h2>
+              <p className="text-xs sm:text-sm text-[#594137] mt-1">
+                Everything you need to know about recipes, Gemini AI kitchen, and pantry matching.
+              </p>
+            </div>
+
+            <div className="max-w-3xl mx-auto space-y-3">
+              {[
+                {
+                  id: 0,
+                  q: 'How does the Gemini AI recipe generator create meals from my leftovers?',
+                  a: 'Gemini analyzes the flavor profiles, textures, and cooking dynamics of the ingredients you specify, identifying classic culinary matches and culinary transformations. It outputs exact measurements, prep times, and step-by-step instructions tailored to your dietary goals.',
+                },
+                {
+                  id: 1,
+                  q: 'Can I swap ingredients if I have allergies or dietary restrictions?',
+                  a: 'Yes! Inside the AI Kitchen studio, tap the Substitutions tab or click "Make Healthier" on any recipe. You can instantly ask for dairy-free, keto, low-sodium, nut-free, or vegan swaps without sacrificing texture or flavor.',
+                },
+                {
+                  id: 2,
+                  q: 'Are my custom recipes and meal plans saved privately?',
+                  a: 'Yes, 100%. All custom recipes, weekly meal plans, grocery shopping lists, and saved bookmark collections are stored securely in your browser local storage with zero tracking or account mandates required.',
+                },
+                {
+                  id: 3,
+                  q: 'How does the weekly meal planner export to grocery shopping lists?',
+                  a: 'When you build your weekly schedule in the Weekly Meal Planner tab, simply click "Export to Grocery List". The app automatically aggregates all recipe ingredients, combines duplicate quantities, and categorizes them by aisle (Produce, Dairy, Protein, Spices).',
+                },
+              ].map((faq) => {
+                const isExpanded = expandedFaqId === faq.id;
+                return (
+                  <div
+                    key={faq.id}
+                    onClick={() => setExpandedFaqId(isExpanded ? null : faq.id)}
+                    className="border border-[#e1bfb2]/30 rounded-2xl p-4 sm:p-5 hover:bg-[#fef1ea]/30 transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="font-serif text-sm sm:text-base font-bold text-[#201a17]">
+                        {faq.q}
+                      </h3>
+                      <span className="material-symbols-outlined text-[#9f3d00] text-[20px] shrink-0">
+                        {isExpanded ? 'remove_circle_outline' : 'add_circle_outline'}
+                      </span>
+                    </div>
+
+                    {isExpanded && (
+                      <p className="mt-3 pt-3 border-t border-[#f8ece5] text-xs sm:text-sm text-[#594137] leading-relaxed animate-in fade-in duration-200">
+                        {faq.a}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* 12. COMMUNITY & LOCAL STATS STRIP */}
         <section className="mt-10 sm:mt-16">
           <div className="rounded-2xl bg-[#fef1ea] p-4 sm:p-6 lg:p-8 shadow-xs border border-[#e1bfb2]/40">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 items-center text-center sm:text-left">
