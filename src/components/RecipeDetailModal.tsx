@@ -197,13 +197,13 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                 </button>
               )}
 
-              {isOwner && onDeleteRecipe && (
+              {onDeleteRecipe && (
                 <button
+                  id="detail-delete-recipe-btn"
                   onClick={() => {
-                    onClose();
                     onDeleteRecipe(recipe.id, recipe.title);
                   }}
-                  className="w-10 h-10 rounded-full bg-black/50 hover:bg-rose-600 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-black/50 hover:bg-rose-600 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
                   title="Delete Recipe"
                 >
                   <Trash2 className="w-4 h-4" />

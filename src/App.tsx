@@ -666,8 +666,10 @@ export default function App() {
       {/* Delete Confirmation Modal */}
       {deleteTarget && (
         <DeleteConfirmModal
-          title={`Delete "${deleteTarget.title}"?`}
-          description="Are you sure you want to delete this recipe from your personal culinary book? This action cannot be undone."
+          isOpen={true}
+          title="Delete Recipe"
+          itemTitle={deleteTarget.title}
+          message="Are you sure you want to delete this recipe from your personal culinary book? This action cannot be undone."
           onConfirm={() => handleDeleteRecipe(deleteTarget.id)}
           onCancel={() => setDeleteTarget(null)}
         />
