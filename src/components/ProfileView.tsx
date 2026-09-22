@@ -454,7 +454,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           {/* Metric KPI Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
             <div 
-              onClick={() => onNavigate('my-recipes')}
+              onClick={() => navigateHandler('my-recipes')}
               className="p-4 rounded-2xl bg-amber-50/70 border border-amber-100 hover:bg-amber-100/70 transition-colors cursor-pointer text-center"
             >
               <span className="text-2xl sm:text-3xl font-serif font-bold text-[#9f3d00]">
@@ -464,7 +464,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
 
             <div 
-              onClick={() => onNavigate('saved')}
+              onClick={() => navigateHandler('saved')}
               className="p-4 rounded-2xl bg-rose-50/70 border border-rose-100 hover:bg-rose-100/70 transition-colors cursor-pointer text-center"
             >
               <span className="text-2xl sm:text-3xl font-serif font-bold text-rose-600">
@@ -474,7 +474,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
 
             <div 
-              onClick={() => onNavigate('collections')}
+              onClick={() => navigateHandler('collections')}
               className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 hover:bg-emerald-100/70 transition-colors cursor-pointer text-center"
             >
               <span className="text-2xl sm:text-3xl font-serif font-bold text-emerald-700">
@@ -484,7 +484,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
 
             <div 
-              onClick={() => onNavigate('following')}
+              onClick={() => navigateHandler('following')}
               className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 hover:bg-indigo-100/70 transition-colors cursor-pointer text-center"
             >
               <span className="text-2xl sm:text-3xl font-serif font-bold text-indigo-700">
@@ -494,7 +494,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
 
             <div 
-              onClick={() => onNavigate('ai-kitchen')}
+              onClick={() => navigateHandler('ai-kitchen')}
               className="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 hover:bg-purple-100/70 transition-colors cursor-pointer text-center col-span-2 sm:col-span-1"
             >
               <span className="text-2xl sm:text-3xl font-serif font-bold text-purple-700 flex items-center justify-center gap-1">
@@ -510,7 +510,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       {/* Quick Navigation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div 
-          onClick={() => onNavigate('my-recipes')}
+          onClick={() => navigateHandler('my-recipes')}
           className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
@@ -526,7 +526,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         </div>
 
         <div 
-          onClick={() => onNavigate('activity')}
+          onClick={() => navigateHandler('activity')}
           className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>
@@ -542,7 +542,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         </div>
 
         <div 
-          onClick={() => onNavigate('settings')}
+          onClick={() => navigateHandler('settings')}
           className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div>

@@ -51,8 +51,8 @@ export default function App() {
       return;
     }
     if (tab === 'my-recipes') {
-      const isConfigured = isOnboarded() && profile.name && profile.name.trim() !== '' && profile.name !== 'Home Chef';
-      if (!isConfigured) {
+      const isConfigured = isOnboarded() && profile?.name && profile.name.trim() !== '' && profile.name !== 'Home Chef';
+      if (!isConfigured && !isOnboarded()) {
         setIsOnboardingOpen(true);
       }
     }
@@ -577,7 +577,8 @@ export default function App() {
               onUpdateProfile={(updated) => setProfile(updated)}
               onSelectRecipe={(r) => setSelectedRecipeForDetail(r)}
               onStartCooking={handleStartCooking}
-              onNavigateToTab={(tab) => setActiveTab(tab)}
+              onNavigate={(tab) => handleTabChange(tab as ActiveTab)}
+              onNavigateToTab={(tab) => handleTabChange(tab as ActiveTab)}
               onOpenCreateRecipe={() => {
                 setRecipeToEdit(null);
                 setIsCreateEditModalOpen(true);
@@ -589,7 +590,8 @@ export default function App() {
         {activeTab === 'activity' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <ActivityView
-              onSelectRecipe={(recId) => {
+              onNavigate={(tab) => handleTabChange(tab as ActiveTab)}
+              onSelectRecipeById={(recId) => {
                 const found = recipes.find((r) => r.id === recId);
                 if (found) setSelectedRecipeForDetail(found);
               }}
@@ -740,6 +742,19 @@ export default function App() {
         <CookingModeModal
           recipe={activeCookingRecipe}
           onClose={() => setActiveCookingRecipe(null)}
+        />
+      )}
+
+      {/* Onboarding & Chef Profile Customization Modal */}
+      {isOnboardingOpen && (
+        <OnboardingModal
+          isOpen={isOnboardingOpen}
+          initialProfile={profile}
+          onClose={() => setIsOnboardingOpen(false)}
+          onComplete={(updated) => {
+            setProfile(updated);
+            setIsOnboardingOpen(false);
+          }}
         />
       )}
 
