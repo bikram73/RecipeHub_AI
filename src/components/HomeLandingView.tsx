@@ -46,19 +46,62 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
   const [selectedDietary, setSelectedDietary] = useState<string | null>(null);
   const [showFiltersDropdown, setShowFiltersDropdown] = useState<'cuisine' | 'time' | 'dietary' | null>(null);
 
-  const handleVoiceSearch = () => {
-    setIsListening(true);
-    setTimeout(() => {
-      setSearchInput("Garlic butter shrimp with lemon pasta");
-      setIsListening(false);
-    }, 1200);
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    let query = searchInput.trim();
+    if (selectedCuisine && selectedCuisine !== 'All Cuisines') {
+      query = query ? `${query} ${selectedCuisine}` : selectedCuisine;
+    }
+    if (selectedDietary && selectedDietary !== 'All Diets') {
+      query = query ? `${query} ${selectedDietary}` : selectedDietary;
+    }
+    if (selectedCookTime && selectedCookTime !== 'Any Time') {
+      query = query ? `${query} ${selectedCookTime}` : selectedCookTime;
+    }
+    onSearch?.(query);
+    onNavigate('explore');
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchInput.trim()) {
-      onSearch?.(searchInput.trim());
-      onNavigate('explore');
+  const handleVoiceSearch = () => {
+    setIsListening(true);
+    if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      try {
+        const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const recognition = new SpeechRec();
+        recognition.lang = 'en-US';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          setSearchInput(transcript);
+          setIsListening(false);
+          onSearch?.(transcript);
+          onNavigate('explore');
+        };
+        recognition.onerror = () => {
+          setSearchInput("Garlic butter shrimp with lemon pasta");
+          setIsListening(false);
+          setTimeout(() => {
+            onSearch?.("Garlic butter shrimp with lemon pasta");
+            onNavigate('explore');
+          }, 300);
+        };
+        recognition.start();
+      } catch (err) {
+        setTimeout(() => {
+          setSearchInput("Garlic butter shrimp with lemon pasta");
+          setIsListening(false);
+          onSearch?.("Garlic butter shrimp with lemon pasta");
+          onNavigate('explore');
+        }, 800);
+      }
+    } else {
+      setTimeout(() => {
+        setSearchInput("Garlic butter shrimp with lemon pasta");
+        setIsListening(false);
+        onSearch?.("Garlic butter shrimp with lemon pasta");
+        onNavigate('explore');
+      }, 800);
     }
   };
 
@@ -657,12 +700,19 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
               </div>
 
               {/* Overlapping Decorative AI Tip Floating Card */}
-              <div className="hidden sm:flex absolute -bottom-5 -left-6 z-20 items-center gap-3 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl shadow-xl border border-[#e1bfb2]/40 max-w-xs">
+              <div 
+                onClick={() => onSelectRecipe(heroTuscanSalmon)}
+                className="hidden sm:flex absolute -bottom-5 -left-6 z-20 items-center gap-3 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl shadow-xl border border-[#e1bfb2]/40 max-w-xs cursor-pointer hover:scale-105 transition-transform"
+                title="View Tuscan Salmon Recipe Tips"
+              >
                 <div className="w-10 h-10 rounded-xl bg-[#ffdbcd] flex items-center justify-center shrink-0 text-[#9f3d00]">
                   <span className="material-symbols-outlined text-[24px]">soup_kitchen</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs text-[#201a17] font-bold">Gemini Kitchen Insight</span>
+                  <span className="text-xs text-[#201a17] font-bold flex items-center gap-1">
+                    <span>Gemini Kitchen Insight</span>
+                    <span className="text-[10px] text-[#9f3d00] font-bold">✨ Tap to cook</span>
+                  </span>
                   <span className="text-xs text-[#594137]">"Substitute coconut cream for lactose-free Tuscan salmon!"</span>
                 </div>
               </div>
@@ -1225,34 +1275,46 @@ export const HomeLandingView: React.FC<HomeLandingViewProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center text-center md:text-left">
               
               {/* Stat 1 */}
-              <div className="flex items-center gap-3.5 justify-center md:justify-start">
-                <div className="w-12 h-12 rounded-xl bg-white text-[#9f3d00] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30">
+              <div 
+                onClick={() => onNavigate('explore')}
+                className="flex items-center gap-3.5 justify-center md:justify-start p-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer group"
+                title="Explore 12,000+ Recipes"
+              >
+                <div className="w-12 h-12 rounded-xl bg-white text-[#9f3d00] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30 group-hover:scale-105 transition-transform">
                   <span className="material-symbols-outlined text-[26px]">groups</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-serif text-lg text-[#201a17] font-bold">12,000+ Recipes</span>
+                  <span className="font-serif text-lg text-[#201a17] font-bold group-hover:text-[#9f3d00] transition-colors">12,000+ Recipes</span>
                   <span className="text-xs text-[#594137]">Community tested & verified by home cooks</span>
                 </div>
               </div>
 
               {/* Stat 2 */}
-              <div className="flex items-center gap-3.5 justify-center md:justify-start">
-                <div className="w-12 h-12 rounded-xl bg-white text-[#00685d] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30">
+              <div 
+                onClick={() => onNavigate('settings')}
+                className="flex items-center gap-3.5 justify-center md:justify-start p-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer group"
+                title="View Privacy & Local Storage Settings"
+              >
+                <div className="w-12 h-12 rounded-xl bg-white text-[#00685d] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30 group-hover:scale-105 transition-transform">
                   <span className="material-symbols-outlined text-[26px]">lock</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-serif text-lg text-[#201a17] font-bold">100% Private</span>
+                  <span className="font-serif text-lg text-[#201a17] font-bold group-hover:text-[#00685d] transition-colors">100% Private</span>
                   <span className="text-xs text-[#594137]">Stored directly in your browser's local memory</span>
                 </div>
               </div>
 
               {/* Stat 3 */}
-              <div className="flex items-center gap-3.5 justify-center md:justify-start">
-                <div className="w-12 h-12 rounded-xl bg-white text-[#8e4e14] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30">
+              <div 
+                onClick={() => onNavigate('ai-kitchen')}
+                className="flex items-center gap-3.5 justify-center md:justify-start p-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer group"
+                title="Launch Gemini AI Kitchen"
+              >
+                <div className="w-12 h-12 rounded-xl bg-white text-[#8e4e14] flex items-center justify-center shrink-0 shadow-xs border border-[#e1bfb2]/30 group-hover:scale-105 transition-transform">
                   <span className="material-symbols-outlined text-[26px]">cognition</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-serif text-lg text-[#201a17] font-bold">Gemini AI Inside</span>
+                  <span className="font-serif text-lg text-[#201a17] font-bold group-hover:text-[#8e4e14] transition-colors">Gemini AI Inside</span>
                   <span className="text-xs text-[#594137]">Smart ingredient substitutes & recipe scalers</span>
                 </div>
               </div>
