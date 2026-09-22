@@ -415,7 +415,7 @@ export default function App() {
       />
 
       {/* Main Content View Switcher */}
-      <main className="flex-1 w-full pt-20">
+      <main className="flex-1 w-full pt-16 sm:pt-20 pb-24 lg:pb-10">
         {activeTab === 'home' && (
           <HomeLandingView
             recipes={recipes}
@@ -695,11 +695,14 @@ export default function App() {
       )}
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#e1bfb2]/40 px-2 py-2 flex items-center justify-around shadow-lg">
+      <nav 
+        aria-label="Mobile Navigation"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#e1bfb2]/50 px-2 py-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-lg"
+      >
         <button
           onClick={() => handleTabChange('home')}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
-            activeTab === 'home' ? 'text-[#9f3d00]' : 'text-gray-500'
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer transition-transform active:scale-95 py-1 px-2.5 rounded-xl ${
+            activeTab === 'home' ? 'text-[#9f3d00] font-bold' : 'text-gray-500 hover:text-gray-900'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">home</span>
@@ -708,8 +711,8 @@ export default function App() {
 
         <button
           onClick={() => handleTabChange('explore')}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
-            activeTab === 'explore' ? 'text-[#9f3d00]' : 'text-gray-500'
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer transition-transform active:scale-95 py-1 px-2.5 rounded-xl ${
+            activeTab === 'explore' ? 'text-[#9f3d00] font-bold' : 'text-gray-500 hover:text-gray-900'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">explore</span>
@@ -718,10 +721,10 @@ export default function App() {
 
         <button
           onClick={() => handleTabChange('ai-kitchen')}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer transition-transform active:scale-95 py-1 px-2.5 rounded-xl ${
             activeTab === 'ai-kitchen' || activeTab === 'generator'
-              ? 'text-[#9f3d00]'
-              : 'text-gray-500'
+              ? 'text-[#9f3d00] font-bold'
+              : 'text-gray-500 hover:text-gray-900'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
@@ -733,7 +736,7 @@ export default function App() {
             setRecipeToEdit(null);
             setIsCreateEditModalOpen(true);
           }}
-          className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-[#9f3d00] cursor-pointer"
+          className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-[#9f3d00] cursor-pointer transition-transform active:scale-95 py-0.5 px-2"
         >
           <div className="w-6 h-6 rounded-full bg-[#9f3d00] text-white flex items-center justify-center shadow-xs">
             <span className="material-symbols-outlined text-[16px]">add</span>
@@ -743,14 +746,14 @@ export default function App() {
 
         <button
           onClick={() => handleTabChange('saved')}
-          className={`relative flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
-            activeTab === 'saved' ? 'text-[#9f3d00]' : 'text-gray-500'
+          className={`relative flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer transition-transform active:scale-95 py-1 px-2.5 rounded-xl ${
+            activeTab === 'saved' ? 'text-[#9f3d00] font-bold' : 'text-gray-500 hover:text-gray-900'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">bookmark</span>
           <span>Saved</span>
           {savedCount > 0 && (
-            <span className="absolute -top-1 right-2 w-4 h-4 bg-[#9f3d00] text-white rounded-full text-[9px] font-bold flex items-center justify-center">
+            <span className="absolute 0 right-1.5 w-4 h-4 bg-[#9f3d00] text-white rounded-full text-[9px] font-bold flex items-center justify-center">
               {savedCount}
             </span>
           )}
@@ -758,14 +761,14 @@ export default function App() {
 
         <button
           onClick={() => handleTabChange('profile')}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer ${
-            activeTab === 'profile' ? 'text-[#9f3d00]' : 'text-gray-500'
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold cursor-pointer transition-transform active:scale-95 py-1 px-2.5 rounded-xl ${
+            activeTab === 'profile' ? 'text-[#9f3d00] font-bold' : 'text-gray-500 hover:text-gray-900'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">person</span>
           <span>Profile</span>
         </button>
-      </div>
+      </nav>
     </div>
   );
 }

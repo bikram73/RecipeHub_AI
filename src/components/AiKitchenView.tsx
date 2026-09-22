@@ -171,7 +171,7 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
             </p>
           </div>
 
-          <div className="flex flex-wrap md:flex-nowrap gap-2 bg-black/20 backdrop-blur-md p-1.5 rounded-2xl">
+          <div className="flex items-center overflow-x-auto sm:flex-wrap md:flex-nowrap gap-1.5 sm:gap-2 bg-black/20 backdrop-blur-md p-1.5 rounded-2xl max-w-full">
             {[
               { id: 'generator', label: 'Recipe Generator', icon: ChefHat },
               { id: 'assistant', label: 'Cooking Chat', icon: MessageSquare },
@@ -181,10 +181,10 @@ export const AiKitchenView: React.FC<AiKitchenViewProps> = ({
               <button
                 key={id}
                 onClick={() => setActiveSubTab(id as any)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                   activeSubTab === id
                     ? 'bg-white text-[#9f3d00] shadow-sm'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                    : 'text-white/85 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <Icon className="w-4 h-4" />
