@@ -403,6 +403,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={handleTabChange}
         savedCount={savedCount}
+        groceryCount={groceryItems.filter((i) => !i.completed).length}
         myRecipesCount={myRecipesCount}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
