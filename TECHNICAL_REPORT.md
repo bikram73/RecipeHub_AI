@@ -1,5 +1,12 @@
 # 📊 RecipeHub AI — Technical Report & Benchmark Analysis
 
+<div align="center">
+
+[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-recipe--hub--ai.netlify.app-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://recipe-hub-ai.netlify.app/)
+[![GitHub Repo](https://img.shields.io/badge/📂%20GitHub-bikram73%2FRecipeHub__AI-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/bikram73/RecipeHub_AI)
+
+</div>
+
 ## 🎯 Scope & Objectives
 This report details the technical implementation, benchmarking, anti-hallucination guardrails, and validation strategies for RecipeHub AI.
 

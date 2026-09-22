@@ -6,12 +6,21 @@
 
 **An AI-Powered Full-Stack Recipe Platform & Smart Kitchen Studio**
 
+[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-recipe--hub--ai.netlify.app-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://recipe-hub-ai.netlify.app/)
+[![GitHub Repo](https://img.shields.io/badge/📂%20GitHub-bikram73%2FRecipeHub__AI-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/bikram73/RecipeHub_AI)
+
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.1-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Express](https://img.shields.io/badge/Express-4.21-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.8_Flash-8E75C4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+### 🔗 Project Links
+
+| 🌐 **Live Deployment** | 📂 **GitHub Repository** |
+|:---:|:---:|
+| [https://recipe-hub-ai.netlify.app/](https://recipe-hub-ai.netlify.app/) | [https://github.com/bikram73/RecipeHub_AI](https://github.com/bikram73/RecipeHub_AI) |
 
 </div>
 
@@ -191,8 +200,8 @@ recipehub-ai/
 
 ### 2. Clone Repository
 ```bash
-git clone https://github.com/your-username/recipehub-ai.git
-cd recipehub-ai
+git clone https://github.com/bikram73/RecipeHub_AI.git
+cd RecipeHub_AI
 ```
 
 ### 3. Install Dependencies

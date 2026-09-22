@@ -1,5 +1,12 @@
 # 🏗️ RecipeHub AI — Complete System Architecture & Technical Design
 
+<div align="center">
+
+[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-recipe--hub--ai.netlify.app-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://recipe-hub-ai.netlify.app/)
+[![GitHub Repo](https://img.shields.io/badge/📂%20GitHub-bikram73%2FRecipeHub__AI-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/bikram73/RecipeHub_AI)
+
+</div>
+
 ## 📋 Executive Overview
 
 **RecipeHub AI** is an intelligent, full-stack recipe studio designed for real-time culinary generation, kitchen workflow management, and meal planning. The architecture employs a **secure server-side proxy pattern** integrating Google's Gemini models with a responsive, modern React 19 single-page application.
