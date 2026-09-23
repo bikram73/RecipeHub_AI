@@ -27,19 +27,6 @@ interface ExploreViewProps {
   searchQuery: string;
 }
 
-const CUISINE_OPTIONS = [
-  'All',
-  'Indian',
-  'Italian',
-  'French-Nordic',
-  'Mexican',
-  'Japanese',
-  'Mediterranean',
-  'American',
-  'Chinese',
-  'Thai',
-];
-
 const CATEGORY_OPTIONS = [
   { id: 'all', label: 'All Categories' },
   { id: 'breakfast', label: 'Breakfast' },
@@ -69,7 +56,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   onNavigateToGenerator,
   searchQuery,
 }) => {
-  const [selectedCuisine, setSelectedCuisine] = useState('All');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedDietary, setSelectedDietary] = useState('All');
   const [maxTime, setMaxTime] = useState<number>(120);
@@ -87,7 +73,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   };
 
   const handleResetFilters = () => {
-    setSelectedCuisine('All');
     setSelectedCategory('all');
     setSelectedDietary('All');
     setMaxTime(120);
@@ -128,11 +113,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           if (!matchesAllTokens) {
             return false;
           }
-        }
-
-        // Cuisine filter
-        if (selectedCuisine !== 'All' && recipe.cuisine !== selectedCuisine) {
-          return false;
         }
 
         // Category filter
@@ -176,7 +156,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   }, [
     recipes,
     searchQuery,
-    selectedCuisine,
     selectedCategory,
     selectedDietary,
     selectedDifficulty,
@@ -189,7 +168,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   }, [recipes]);
 
   const hasActiveFilter =
-    selectedCuisine !== 'All' ||
     selectedCategory !== 'all' ||
     selectedDietary !== 'All' ||
     selectedDifficulty !== 'All' ||
@@ -291,20 +269,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
         </div>
 
         {/* Dropdown Filters Row */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 pt-1 border-t border-gray-100">
-          <div>
-            <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Cuisine</label>
-            <select
-              value={selectedCuisine}
-              onChange={(e) => setSelectedCuisine(e.target.value)}
-              className="w-full px-2.5 py-2 text-xs rounded-xl border border-gray-200 bg-white"
-            >
-              {CUISINE_OPTIONS.map((c) => (
-                <option key={c} value={c}>{c === 'All' ? 'All Cuisines' : c}</option>
-              ))}
-            </select>
-          </div>
-
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 border-t border-gray-100">
           <div>
             <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Dietary Target</label>
             <select
@@ -346,7 +311,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             </select>
           </div>
 
-          <div className="col-span-2 sm:col-span-4 lg:col-span-1">
+          <div>
             <div className="flex justify-between text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
               <span>Max Time</span>
               <span className="text-[#9f3d00]">{maxTime >= 120 ? 'Any' : `${maxTime}m`}</span>
